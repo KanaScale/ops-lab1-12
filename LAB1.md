@@ -26,8 +26,8 @@
 | 项 | 链接或文本 |
 |---|---|
 | 任务 2：首次 CI 与主干制品 | [成功的 ci 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39020295552)；artifact：ci-460db78f01fb5fab539badcb6f67763a662bb766-1；trace.sh 校验和通过，追溯到提交 460db78f01fb5fab539badcb6f67763a662bb766、构建号 1、运行号 39020295552。 |
-| 规则集里启用的规则 | <列出规则名、审批人数和必需检查的名称> |
-| 组长直接 `git push origin main` 被拒的终端输出 | <粘贴文本> |
+| 规则集里启用的规则 | [lab1-main-merge-gate](https://github.com/KanaScale/ops-lab1-12/rules/25298191)：Active，仅适用于默认分支 main，绕过名单为空；Restrict deletions、Block force pushes、Require a pull request before merging（至少 1 人审批）、Require status checks to pass（必需检查 `ci`）。 |
+| 组长直接 `git push origin main` 被拒的终端输出 | 组长在 main 上创建空提交 `ea2d38f` 后执行 `git push origin main`，收到以下输出；验证后已将本地 main 恢复到 `origin/main`：<br>remote: error: GH013: Repository rule violations found for refs/heads/main.<br>remote: Review all repository rules at https://github.com/KanaScale/ops-lab1-12/rules?ref=refs%2Fheads%2Fmain<br>remote: - Changes must be made through a pull request.<br>remote: - Required status check "ci" is expected.<br>To https://github.com/KanaScale/ops-lab1-12.git<br> ! [remote rejected] main -> main (push declined due to repository rule violations)<br>error: failed to push some refs to 'https://github.com/KanaScale/ops-lab1-12.git' |
 | 第一轮：失败的 PR 运行 | <链接> |
 | 第一轮：修复后通过的 PR 运行 | <链接> |
 | 第一轮：合入 main 后的运行（含制品） | <链接> |
