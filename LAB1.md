@@ -9,7 +9,7 @@
 | 小组 | 第 12 组 |
 | 仓库地址 | https://github.com/KanaScale/ops-lab1-12 |
 | 代码载体 | 统一示例（`enroll-conflict`） |
-| runner 与语言版本 | CI 计划使用 `ubuntu-24.04`、Go `1.26.9`；任务 0 本地使用 Go `1.26.9` |
+| runner 与语言版本 | CI 已使用 `ubuntu-24.04`、Go `1.26.9`；任务 0 本地使用 Go `1.26.9` |
 | 合并方式 | squash（仓库已设置只允许 squash merging） |
 
 ## 2. 任务 0：本地基线
@@ -25,6 +25,7 @@
 
 | 项 | 链接或文本 |
 |---|---|
+| 任务 2：首次 CI 与主干制品 | [成功的 ci 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39020295552)；artifact：ci-460db78f01fb5fab539badcb6f67763a662bb766-1；trace.sh 校验和通过，追溯到提交 460db78f01fb5fab539badcb6f67763a662bb766、构建号 1、运行号 39020295552。 |
 | 规则集里启用的规则 | <列出规则名、审批人数和必需检查的名称> |
 | 组长直接 `git push origin main` 被拒的终端输出 | <粘贴文本> |
 | 第一轮：失败的 PR 运行 | <链接> |
