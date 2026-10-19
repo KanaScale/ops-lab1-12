@@ -151,7 +151,9 @@ exit_code=0
 |---|---|---|---|
 | [ci #17 / 39238364986](https://github.com/KanaScale/ops-lab1-12/actions/runs/39238364986) | PR #6 | 13 秒 | `ci` job：2026-10-19 18:34:03～18:34:16（北京时间），成功；不含排队时间。 |
 | [ci #18 / 39240920512](https://github.com/KanaScale/ops-lab1-12/actions/runs/39240920512) | push main（PR #6 squash 合并） | 17 秒 | `ci` job：2026-10-19 18:55:31～18:55:48（北京时间），成功并上传主干制品；不含排队时间。 |
-| #<编号> | <填写> | <填写> | <填写> |
+| [ci #11 / 39223510487](https://github.com/KanaScale/ops-lab1-12/actions/runs/39223510487) | PR #4（仅有缺陷） | 9 秒 | `ci` job：2026-10-19 16:32:41～16:32:50（北京时间），成功；不含排队时间。 |
+| [ci #12 / 39224774268](https://github.com/KanaScale/ops-lab1-12/actions/runs/39224774268) | PR #4（补充测试） | 16 秒 | `ci` job：2026-10-19 16:43:17～16:43:33（北京时间），测试失败；不含排队时间。 |
+| [ci #13 / 39225332486](https://github.com/KanaScale/ops-lab1-12/actions/runs/39225332486) | PR #4（撤销缺陷） | 10 秒 | `ci` job：2026-10-19 16:47:54～16:48:04（北京时间），成功；不含排队时间。 |
 
 ## 6. 分析问题
 
