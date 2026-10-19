@@ -37,7 +37,8 @@
 | 第二轮：撤销缺陷后通过的运行 | <链接> |
 | 未合入分支上的 tag 被 release gate 拒绝的运行 | <链接> |
 | Release v1.0.0 | [v1.0.0](https://github.com/KanaScale/ops-lab1-12/releases/tag/v1.0.0)，发布于 2026-10-19 17:40:27（北京时间）；任务 6 发布前的附件复核见第 4 节。 |
-| Release v1.0.1 | <链接> |
+| 任务 6：小改动、审批与合并 | CynicDora 的 [PR #6](https://github.com/KanaScale/ops-lab1-12/pull/6) 为 `/version` 增加 `Cache-Control: no-store` 及响应头测试；[PR ci #17](https://github.com/KanaScale/ops-lab1-12/actions/runs/39238364986) 通过，fireDragon198 于 2026-10-19 18:54:03（北京时间）正式 APPROVED，18:55:26 squash 合并为 [3fccca8](https://github.com/KanaScale/ops-lab1-12/commit/3fccca88908d51c86316dce5fcadc2c5dd14ca3f)，[main ci #18](https://github.com/KanaScale/ops-lab1-12/actions/runs/39240920512) 通过。 |
+| Release v1.0.1 | [v1.0.1](https://github.com/KanaScale/ops-lab1-12/releases/tag/v1.0.1)，发布于 2026-10-19 18:57:31（北京时间）；[release #3](https://github.com/KanaScale/ops-lab1-12/actions/runs/39241133673) 的主干祖先检查、fmt-check、vet、test、打包与校验均通过。 |
 
 ## 4. 追溯与运行
 
@@ -45,18 +46,18 @@
 
 | 项 | v1.0.0 | v1.0.1 |
 |---|---|---|
-| 版本号 | 1.0.0 | <填写> |
-| 构建号 | 1 | <填写> |
-| 提交号（SHA） | `f03b6ea350257855fb5862eacaff5efcfcee81f0` | <填写> |
-| 引入该提交的 PR | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5) | <编号与链接> |
-| 构建它的 Actions 运行（`trace.sh` 给出的链接） | [release #1 / run_id 39231789999](https://github.com/KanaScale/ops-lab1-12/actions/runs/39231789999) | <链接> |
-| 制品 sha256（发布当时，取自 Release 里的 .sha256） | `ad67bf9b7ee40853a874b1e8ebedb7c676ee0e4ba8c70d49bef426d39c577870` | <填写> |
+| 版本号 | 1.0.0 | 1.0.1 |
+| 构建号 | 1 | 3 |
+| 提交号（SHA） | `f03b6ea350257855fb5862eacaff5efcfcee81f0` | `3fccca88908d51c86316dce5fcadc2c5dd14ca3f` |
+| 引入该提交的 PR | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5) | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6) |
+| 构建它的 Actions 运行（`trace.sh` 给出的链接） | [release #1 / run_id 39231789999](https://github.com/KanaScale/ops-lab1-12/actions/runs/39231789999) | [release #3 / run_id 39241133673](https://github.com/KanaScale/ops-lab1-12/actions/runs/39241133673) |
+| 制品 sha256（发布当时，取自 Release 里的 .sha256） | `ad67bf9b7ee40853a874b1e8ebedb7c676ee0e4ba8c70d49bef426d39c577870` | `16f9d837187746840f8e662a04ec76fef5dadcb26a631567b09b774ff257e494` |
 
 v1.0.0 的上述 SHA-256 取自发布附件的 `.sha256`，并在 2026-10-19 18:27:48（北京时间，发布 v1.0.1 之前）重新下载核验为一致，作为后续回退的独立对照值；采集主机为 Ubuntu / x86_64。
 
 仅凭构建号不能唯一确定是哪次运行。v1.0.0 的构建号为 1，分别存在 [ci #1 / run_id 39020295552](https://github.com/KanaScale/ops-lab1-12/actions/runs/39020295552) 和 [release #1 / run_id 39231789999](https://github.com/KanaScale/ops-lab1-12/actions/runs/39231789999)。两个工作流各自编号，须使用 `BUILD_INFO` 中的 `run_id` 定位实际构建。
 
-发布 v1.0.1 之后重新下载 v1.0.0 的附件，计算得到的 sha256：<填写>。与上表中发布当时的值是否一致？<填写>
+发布 v1.0.1 之后，于 2026-10-19 18:58:38（北京时间）开始在同一台 WSL Ubuntu / x86_64 主机上重新下载两个版本的 Release 附件并采集以下输出；v1.0.0 的 sha256 为 `ad67bf9b7ee40853a874b1e8ebedb7c676ee0e4ba8c70d49bef426d39c577870`，与发布附件的 `.sha256`、原始 [release #1 日志](https://github.com/KanaScale/ops-lab1-12/actions/runs/39231789999) 以及发布 v1.0.1 前独立保存的值完全一致。v1.0.1 的哈希也与其 `.sha256` 和 [release #3 日志](https://github.com/KanaScale/ops-lab1-12/actions/runs/39241133673) 一致；两个 tag 均与各自 `BUILD_INFO` 的提交号一致，以下两次 `trace.sh` 的退出码均为 0。
 
 `trace.sh` 输出（v1.0.0）：
 
@@ -85,15 +86,42 @@ exit_code=0
 `trace.sh` 输出（v1.0.1）：
 
 ```text
-<粘贴>
+== 1. 校验和
+enroll-conflict_1.0.1_linux_amd64.tar.gz: OK
+== 2. 制品里的 BUILD_INFO
+name=enroll-conflict
+version=1.0.1
+build_no=3
+run_id=39241133673
+commit=3fccca88908d51c86316dce5fcadc2c5dd14ca3f
+go=go1.26.9
+== 3. 提交 3fccca88908d51c86316dce5fcadc2c5dd14ca3f
+作者: CynicDora <hyzhyzsh@sjtu.edu.cn>
+时间: 2026-10-19T18:55:26+08:00
+标题: fix: prevent caching of version responses (#6)
+主干: 该提交在 origin/main 的历史上
+指向它的 tag: v1.0.1
+版本号: 1.0.1    构建号: 3
+提交页面（含关联的 PR）: https://github.com/KanaScale/ops-lab1-12/commit/3fccca88908d51c86316dce5fcadc2c5dd14ca3f
+构建它的运行: https://github.com/KanaScale/ops-lab1-12/actions/runs/39241133673
+exit_code=0
 ```
 
-任务 6 第 4 步，两次 `/version` 的输出：
+任务 6 第 4 步，从下载的 `.tar.gz` 中解包并直接运行二进制，未重新构建；先运行 v1.0.1，停止后在同一个 `127.0.0.1:18080` 端口运行 v1.0.0，两次 `/version` 的输出如下。
 
-```text
-<运行 v1.0.1 时>
-<换回 v1.0.0 后>
+运行 v1.0.1（2026-10-19 18:58:46，北京时间）：
+
+```json
+{"version":"1.0.1","commit":"3fccca88908d51c86316dce5fcadc2c5dd14ca3f","build_no":"3","go":"go1.26.9"}
 ```
+
+换回 v1.0.0（2026-10-19 18:58:47，北京时间）：
+
+```json
+{"version":"1.0.0","commit":"f03b6ea350257855fb5862eacaff5efcfcee81f0","build_no":"1","go":"go1.26.9"}
+```
+
+两次响应的四个字段均与各自 `BUILD_INFO` 一致；v1.0.1 响应包含 `Cache-Control: no-store`，v1.0.0 没有该响应头，符合本次改动。验证结束后，已停止本次启动的服务。
 
 ## 5. 数据
 
@@ -113,7 +141,7 @@ exit_code=0
 
 | PR | 第一个提交的时间 | 合入时间 | 对应 Release 的发布时间 | 提交到发布的间隔 |
 |---|---|---|---|---|
-| #<编号> | <填写> | <填写> | <填写> | <填写> |
+| [#6](https://github.com/KanaScale/ops-lab1-12/pull/6) | [b9f9aaa](https://github.com/KanaScale/ops-lab1-12/commit/b9f9aaa91547e7c01fcc4ccb84e0e95eae961ecc)：2026-10-19 18:29:57（北京时间，author/committer 时间相同） | 2026-10-19 18:55:26（北京时间） | [v1.0.1](https://github.com/KanaScale/ops-lab1-12/releases/tag/v1.0.1)：2026-10-19 18:57:31（北京时间） | 27 分 34 秒 |
 | #<编号> | <填写> | <填写> | <填写> | <填写> |
 | #<编号> | <填写> | <填写> | <填写> | <填写> |
 
@@ -121,6 +149,8 @@ exit_code=0
 
 | 运行 | 事件（PR / push） | 时长 | 备注 |
 |---|---|---|---|
+| [ci #17 / 39238364986](https://github.com/KanaScale/ops-lab1-12/actions/runs/39238364986) | PR #6 | 13 秒 | `ci` job：2026-10-19 18:34:03～18:34:16（北京时间），成功；不含排队时间。 |
+| [ci #18 / 39240920512](https://github.com/KanaScale/ops-lab1-12/actions/runs/39240920512) | push main（PR #6 squash 合并） | 17 秒 | `ci` job：2026-10-19 18:55:31～18:55:48（北京时间），成功并上传主干制品；不含排队时间。 |
 | #<编号> | <填写> | <填写> | <填写> |
 
 ## 6. 分析问题
@@ -152,7 +182,9 @@ exit_code=0
 
 **问题 4：发布与回退。** 假设 v1.0.1 发布后发现缺陷，应当如何处理？为什么不应删除 v1.0.1 的 tag、再用同一版本号重新发布？任务 6 中将服务从 v1.0.1 切换回 v1.0.0 时，使用的是哪个文件，是否需要重新构建？请用两次 `/version` 的输出说明。如果改为从源码重新构建 v1.0.0，得到的文件与原附件是否相同（参考问题 3）？最后，如果有人删除 v1.0.0 的附件，换上一个新文件和对应的新 `.sha256`，`trace.sh` 能否发现？本组在第 4 节记录的值能否发现？可以查阅 GitHub 的 Immutable releases 设置的用途。
 
-<填写>
+所用数据：第 4 节两次 `/version`、两个版本的 `BUILD_INFO`、两次退出码为 0 的追溯输出，以及 v1.0.0 发布前后均为 `ad67bf9b7ee40853a874b1e8ebedb7c676ee0e4ba8c70d49bef426d39c577870` 的包哈希；[v1.0.0 Release API](https://api.github.com/repos/KanaScale/ops-lab1-12/releases/tags/v1.0.0) 与 [v1.0.1 Release API](https://api.github.com/repos/KanaScale/ops-lab1-12/releases/tags/v1.0.1) 在本次采集时均返回 `immutable: false`。
+
+如果 v1.0.1 发布后发现缺陷，应先部署已验证的 v1.0.0 恢复服务，再通过新分支、PR、CI 和审批修复，合入后发布 v1.0.2 等新的修订版本。不能删除 v1.0.1 的 tag 并复用版本号，否则先后下载者可能拿到不同文件，版本、提交和构建的对应关系失去唯一性，应保留原记录并在发布说明中注明问题。本次直接运行 `enroll-conflict_1.0.0_linux_amd64.tar.gz` 解包得到的 `enroll-conflict_1.0.0_linux_amd64/enroll-conflict`，没有重新构建，运行输出从 `1.0.1 / 3fccca8… / build_no=3` 变为 `1.0.0 / f03b6ea… / build_no=1`，且都与各自 `BUILD_INFO` 一致。v1.0.0 发布前后重新下载的包哈希相同，支持本次回退复用了原附件的字节内容。从源码重建同一个 tag 不能直接保证与原附件相同，只有源码及工作区状态、Go 工具链、目标平台、VERSION/BUILD_NO/RUN_ID/COMMIT 和归档参数等输入一致时才具备可重复条件，问题 3 中改变构建号或归档时间参数会改变相关输入，不能把重编译等同于取回原附件。如果有人同时替换包与其 `.sha256`，并保留指向 main 中真实提交的 `BUILD_INFO`，现有 `trace.sh` 仍可能通过，因为它没有验证包内字节与该提交的真实构建结果之间的可信绑定。独立保存且未被篡改的原始哈希能通过不一致发现替换，GitHub 的 Immutable releases 则能锁定已发布的附件和关联 tag 并生成发布证明，但设置只影响之后的新 Release，本次两个 Release 均未启用该保护（[官方用途](https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases)、[适用范围](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/establish-provenance-and-integrity/prevent-release-changes)）。以上回退成立于原附件可信且可获取、主机兼容 linux/amd64、旧版本兼容当前配置及数据的条件下，本示例没有持久化数据迁移，真实服务若有数据库变更还需兼容迁移与恢复方案。
 
 ## 7. 选做记录
 
@@ -168,4 +200,4 @@ exit_code=0
 
 | GitHub 用户名 | 发起并合入的 PR 编号 | 审批过的 PR 编号 |
 |---|---|---|
-| <用户名> | <编号> | <编号> |
+| CynicDora | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6) | [#2](https://github.com/KanaScale/ops-lab1-12/pull/2) |
