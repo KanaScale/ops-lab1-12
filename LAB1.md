@@ -1,4 +1,4 @@
-# 实验 1 记录：第 <组号> 组
+# 实验 1 记录：第 12 组
 
 现场检查时将打开本文件，按其中的链接核对。证据一律以链接或文本形式给出，不要只贴截图。将 `<填写>` 替换为本组的内容。main 受保护之后，修改本文件也须通过 PR。
 
@@ -6,27 +6,28 @@
 
 | 项 | 内容 |
 |---|---|
-| 小组 | 第 <组号> 组 |
-| 仓库地址 | <https://github.com/…> |
-| 代码载体 | 统一示例 / 自己的项目（<项目名与语言>） |
-| runner 与语言版本 | `ubuntu-24.04`，<Go 或其他语言的版本> |
-| 合并方式 | <squash / merge commit / rebase> |
+| 小组 | 第 12 组 |
+| 仓库地址 | https://github.com/KanaScale/ops-lab1-12 |
+| 代码载体 | 统一示例（`enroll-conflict`） |
+| runner 与语言版本 | CI 已使用 `ubuntu-24.04`、Go `1.26.9`；任务 0 本地使用 Go `1.26.9` |
+| 合并方式 | squash（仓库已设置只允许 squash merging） |
 
 ## 2. 任务 0：本地基线
 
 | 问题 | 观察结果 |
 |---|---|
-| 第一次 `make package` 得到的 BUILD_INFO（粘贴） | <填写> |
-| 修改一行、不提交，再次打包：BUILD_INFO 是否变化？二进制文件的 sha256 是否变化？（贴出两次的 sha256） | <填写> |
-| 两次 `go version -m` 输出中的 vcs 行有何不同？ | <填写> |
-| 仅凭 BUILD_INFO，能否回答该包是什么、在哪台机器上、何时、用哪份代码构建？哪一项信息会出错？ | <填写> |
+| 第一次 `make package` 得到的 BUILD_INFO（粘贴） | `name=enroll-conflict`<br>`version=1.0.0`<br>`build_no=1`<br>`run_id=local`<br>`commit=7b63b41c13f061439997b0e6e4eaa2af922a7aa1`<br>`go=go1.26.9` |
+| 修改一行、不提交，再次打包：BUILD_INFO 是否变化？二进制文件的 sha256 是否变化？（贴出两次的 sha256） | `diff` 输出“BUILD_INFO 没有变化”。二进制 sha256 发生变化：第一次 `f23447d406c42af7dd35e23c2d1b2f15484cfb709cc9b4bb1262643694b8528e`；修改后 `c3d34955681cdc98ee1f1d57270812f6e358b7817e269de1c9b42a77ccfb12ba`。 |
+| 两次 `go version -m` 输出中的 vcs 行有何不同？ | 两次均为 `vcs=git`、`vcs.revision=7b63b41c13f061439997b0e6e4eaa2af922a7aa1`、`vcs.time=2026-10-12T16:26:07Z`；`vcs.modified` 从 `false` 变为 `true`。 |
+| 仅凭 BUILD_INFO，能否回答该包是什么、在哪台机器上、何时、用哪份代码构建？哪一项信息会出错？ | 能从 `name`、`version` 知道包的名称和版本；没有主机标识和构建时间，不能确定在哪台机器、何时构建。`commit` 仍是原提交号，但第二次构建含未提交改动，因此仅凭它会误以为制品完全来自该提交；无法准确确定所用代码。`vcs.time` 是提交时间，不是构建时间。 |
 
 ## 3. 证据
 
 | 项 | 链接或文本 |
 |---|---|
-| 规则集里启用的规则 | <列出规则名、审批人数和必需检查的名称> |
-| 组长直接 `git push origin main` 被拒的终端输出 | <粘贴文本> |
+| 任务 2：首次 CI 与主干制品 | [成功的 ci 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39020295552)；artifact：ci-460db78f01fb5fab539badcb6f67763a662bb766-1；trace.sh 校验和通过，追溯到提交 460db78f01fb5fab539badcb6f67763a662bb766、构建号 1、运行号 39020295552。 |
+| 规则集里启用的规则 | [lab1-main-merge-gate](https://github.com/KanaScale/ops-lab1-12/rules/25298191)：Active，仅适用于默认分支 main，绕过名单为空；Restrict deletions、Block force pushes、Require a pull request before merging（至少 1 人审批）、Require status checks to pass（必需检查 `ci`）。 |
+| 组长直接 `git push origin main` 被拒的终端输出 | 组长在 main 上创建空提交 `ea2d38f` 后执行 `git push origin main`，收到以下输出；验证后已将本地 main 恢复到 `origin/main`：<br>remote: error: GH013: Repository rule violations found for refs/heads/main.<br>remote: Review all repository rules at https://github.com/KanaScale/ops-lab1-12/rules?ref=refs%2Fheads%2Fmain<br>remote: - Changes must be made through a pull request.<br>remote: - Required status check "ci" is expected.<br>To https://github.com/KanaScale/ops-lab1-12.git<br> ! [remote rejected] main -> main (push declined due to repository rule violations)<br>error: failed to push some refs to 'https://github.com/KanaScale/ops-lab1-12.git' |
 | 第一轮：失败的 PR 运行 | <链接> |
 | 第一轮：修复后通过的 PR 运行 | <链接> |
 | 第一轮：合入 main 后的运行（含制品） | <链接> |
