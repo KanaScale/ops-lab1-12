@@ -39,6 +39,10 @@ func TestValid(t *testing.T) {
 	if !good.Valid() {
 		t.Fatalf("%+v 应当合法", good)
 	}
+	single := Section{Weekday: 3, Start: 2, End: 2, Weeks: EvenWeeks}
+	if !single.Valid() {
+		t.Errorf("%+v 应当合法：起始和结束节次均为包含关系", single)
+	}
 	bad := []Section{
 		{Weekday: 0, Start: 1, End: 2, Weeks: AllWeeks},
 		{Weekday: 8, Start: 1, End: 2, Weeks: AllWeeks},
