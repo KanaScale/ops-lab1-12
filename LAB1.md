@@ -28,8 +28,8 @@
 | 任务 2：首次 CI 与主干制品 | [成功的 ci 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39020295552)；artifact：ci-460db78f01fb5fab539badcb6f67763a662bb766-1；trace.sh 校验和通过，追溯到提交 460db78f01fb5fab539badcb6f67763a662bb766、构建号 1、运行号 39020295552。 |
 | 规则集里启用的规则 | [lab1-main-merge-gate](https://github.com/KanaScale/ops-lab1-12/rules/25298191)：Active，仅适用于默认分支 main，绕过名单为空；Restrict deletions、Block force pushes、Require a pull request before merging（至少 1 人审批）、Require status checks to pass（必需检查 `ci`）。 |
 | 组长直接 `git push origin main` 被拒的终端输出 | 组长在 main 上创建空提交 `ea2d38f` 后执行 `git push origin main`，收到以下输出；验证后已将本地 main 恢复到 `origin/main`：<br>remote: error: GH013: Repository rule violations found for refs/heads/main.<br>remote: Review all repository rules at https://github.com/KanaScale/ops-lab1-12/rules?ref=refs%2Fheads%2Fmain<br>remote: - Changes must be made through a pull request.<br>remote: - Required status check "ci" is expected.<br>To https://github.com/KanaScale/ops-lab1-12.git<br> ! [remote rejected] main -> main (push declined due to repository rule violations)<br>error: failed to push some refs to 'https://github.com/KanaScale/ops-lab1-12.git' |
-| 第一轮：失败的 PR 运行 | <链接> |
-| 第一轮：修复后通过的 PR 运行 | <链接> |
+| 第一轮：失败的 PR 运行 | [PR #2](https://github.com/KanaScale/ops-lab1-12/pull/2) 的 [首次 ci 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39214106124)：`make test` 发现单周班与双周班被误判为冲突，检查失败时 PR 状态为 BLOCKED。 |
+| 第一轮：修复后通过的 PR 运行 | [修复提交 0c1513b](https://github.com/KanaScale/ops-lab1-12/commit/0c1513b02777843a8c855d895ae2555445a9a09b) 恢复单双周互不冲突的判断；[ci 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39214314302) 通过。PR 的最终代码差异只新增“双周对双周冲突”测试用例。 |
 | 第一轮：合入 main 后的运行（含制品） | <链接> |
 | 第二轮：找到的缺陷，以及现有测试为何无法发现它 | <一两句话> |
 | 第二轮：仅含缺陷时仍然通过的运行 | <链接> |
@@ -83,10 +83,10 @@
 
 | 事件 | 时间 | 链接 |
 |---|---|---|
-| 发起 PR | <填写> | <PR 链接> |
-| 第一次 `ci` 失败（运行结束） | <填写> | <链接> |
-| 推送修复提交 | <填写> | <链接> |
-| `ci` 通过（运行结束） | <填写> | <链接> |
+| 发起 PR | 2026-10-19 15:08:46（北京时间，GitHub PR 创建时间） | [PR #2](https://github.com/KanaScale/ops-lab1-12/pull/2) |
+| 第一次 `ci` 失败（运行结束） | 2026-10-19 15:08:59（北京时间） | [失败运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39214106124) |
+| 推送修复提交 | 2026-10-19 15:10:38～15:10:43（北京时间；前者为 GitHub 提交时间，后者为推送触发的 CI 创建时间） | [修复提交](https://github.com/KanaScale/ops-lab1-12/commit/0c1513b02777843a8c855d895ae2555445a9a09b)、[CI 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39214314302) |
+| `ci` 通过（运行结束） | 2026-10-19 15:10:59（北京时间） | [通过运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39214314302) |
 | 合入 main | <填写> | <链接> |
 
 提交到发布的间隔，至少记录三个合入的 PR：
