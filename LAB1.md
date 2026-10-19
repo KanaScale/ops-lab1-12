@@ -1,6 +1,6 @@
 # 实验 1 记录：第 12 组
 
-现场检查时将打开本文件，按其中的链接核对。证据一律以链接或文本形式给出，不要只贴截图。将 `<填写>` 替换为本组的内容。main 受保护之后，修改本文件也须通过 PR。
+现场检查时将打开本文件，按其中的链接核对。证据以链接或文本形式给出；main 受保护后，本文件的修改也通过 PR。
 
 ## 1. 基本信息
 
@@ -31,11 +31,11 @@
 | 第一轮：失败的 PR 运行 | [PR #2](https://github.com/KanaScale/ops-lab1-12/pull/2) 的 [首次 ci 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39214106124)：`make test` 发现单周班与双周班被误判为冲突，检查失败时 PR 状态为 BLOCKED。 |
 | 第一轮：修复后通过的 PR 运行 | [修复提交 0c1513b](https://github.com/KanaScale/ops-lab1-12/commit/0c1513b02777843a8c855d895ae2555445a9a09b) 恢复单双周互不冲突的判断；[ci 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39214314302) 通过。PR 的最终代码差异只新增“双周对双周冲突”测试用例。 |
 | 第一轮：合入 main 后的运行（含制品） | [PR #2](https://github.com/KanaScale/ops-lab1-12/pull/2) 经 CynicDora 审批后 squash 合并，main 提交为 [7998cbf](https://github.com/KanaScale/ops-lab1-12/commit/7998cbf66ecb753c4bda4e0dc298b0d51118e9d9)；[main 上成功的 ci 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39216123207) 上传 artifact `ci-7998cbf66ecb753c4bda4e0dc298b0d51118e9d9-8`。 |
-| 第二轮：找到的缺陷，以及现有测试为何无法发现它 | <一两句话> |
-| 第二轮：仅含缺陷时仍然通过的运行 | <链接> |
-| 第二轮：补测试后失败的运行 | <链接> |
-| 第二轮：撤销缺陷后通过的运行 | <链接> |
-| 未合入分支上的 tag 被 release gate 拒绝的运行 | <链接> |
+| 第二轮：找到的缺陷，以及现有测试为何无法发现它 | 将 Section.Valid 的结束节次判断从 End < Start 改成 End <= Start，会把 Start=End 的单节课程错判为无效；原有 TestValid 只测试多节合法课程和其他非法输入，没有覆盖起止节次相等的合法边界。 |
+| 第二轮：仅含缺陷时仍然通过的运行 | [PR #4 的 ci #11](https://github.com/KanaScale/ops-lab1-12/actions/runs/39223510487)：仅含缺陷的提交 6ac8747，ci 成功。 |
+| 第二轮：补测试后失败的运行 | [PR #4 的 ci #12](https://github.com/KanaScale/ops-lab1-12/actions/runs/39224774268)：新增单节课程合法性测试后，ci 在 Test 步骤失败。 |
+| 第二轮：撤销缺陷后通过的运行 | [PR #4 的 ci #13](https://github.com/KanaScale/ops-lab1-12/actions/runs/39225332486)：撤销缺陷后通过；[#4](https://github.com/KanaScale/ops-lab1-12/pull/4) 经 Har0v0i86 审批并 squash 合入，main 只新增测试。 |
+| 未合入分支上的 tag 被 release gate 拒绝的运行 | [release 运行 39232007830](https://github.com/KanaScale/ops-lab1-12/actions/runs/39232007830)：未合入 main 的提交 7440b80 在 Release gate 步骤失败，后续打包与创建 Release 均跳过；测试用 v0.0.1 tag 和 scratch/gate-test 分支已删除。 |
 | Release v1.0.0 | [v1.0.0](https://github.com/KanaScale/ops-lab1-12/releases/tag/v1.0.0)，发布于 2026-10-19 17:40:27（北京时间）；任务 6 发布前的附件复核见第 4 节。 |
 | 任务 6：小改动、审批与合并 | CynicDora 的 [PR #6](https://github.com/KanaScale/ops-lab1-12/pull/6) 为 `/version` 增加 `Cache-Control: no-store` 及响应头测试；[PR ci #17](https://github.com/KanaScale/ops-lab1-12/actions/runs/39238364986) 通过，fireDragon198 于 2026-10-19 18:54:03（北京时间）正式 APPROVED，18:55:26 squash 合并为 [3fccca8](https://github.com/KanaScale/ops-lab1-12/commit/3fccca88908d51c86316dce5fcadc2c5dd14ca3f)，[main ci #18](https://github.com/KanaScale/ops-lab1-12/actions/runs/39240920512) 通过。 |
 | Release v1.0.1 | [v1.0.1](https://github.com/KanaScale/ops-lab1-12/releases/tag/v1.0.1)，发布于 2026-10-19 18:57:31（北京时间）；[release #3](https://github.com/KanaScale/ops-lab1-12/actions/runs/39241133673) 的主干祖先检查、fmt-check、vet、test、打包与校验均通过。 |
@@ -141,19 +141,19 @@ exit_code=0
 
 | PR | 第一个提交的时间 | 合入时间 | 对应 Release 的发布时间 | 提交到发布的间隔 |
 |---|---|---|---|---|
+| [#4](https://github.com/KanaScale/ops-lab1-12/pull/4) | [6ac8747](https://github.com/KanaScale/ops-lab1-12/commit/6ac8747f4e7180e6df3c3c65fd658101db21f23c)：2026-10-19 16:21:48（北京时间） | 2026-10-19 17:02:30（北京时间） | [v1.0.0](https://github.com/KanaScale/ops-lab1-12/releases/tag/v1.0.0)：2026-10-19 17:40:27（北京时间） | 1 小时 18 分 39 秒 |
+| [#5](https://github.com/KanaScale/ops-lab1-12/pull/5) | [2ca520e](https://github.com/KanaScale/ops-lab1-12/commit/2ca520ed65467d359f6c01517e7a743ded79c5c4)：2026-10-19 17:22:57（北京时间） | 2026-10-19 17:38:37（北京时间） | [v1.0.0](https://github.com/KanaScale/ops-lab1-12/releases/tag/v1.0.0)：2026-10-19 17:40:27（北京时间） | 17 分 30 秒 |
 | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6) | [b9f9aaa](https://github.com/KanaScale/ops-lab1-12/commit/b9f9aaa91547e7c01fcc4ccb84e0e95eae961ecc)：2026-10-19 18:29:57（北京时间，author/committer 时间相同） | 2026-10-19 18:55:26（北京时间） | [v1.0.1](https://github.com/KanaScale/ops-lab1-12/releases/tag/v1.0.1)：2026-10-19 18:57:31（北京时间） | 27 分 34 秒 |
-| #<编号> | <填写> | <填写> | <填写> | <填写> |
-| #<编号> | <填写> | <填写> | <填写> | <填写> |
 
 `ci` 工作流的运行时长（从 Actions 页面读取），至少 5 次，全部列出，不要只给出平均值：
 
 | 运行 | 事件（PR / push） | 时长 | 备注 |
 |---|---|---|---|
-| [ci #17 / 39238364986](https://github.com/KanaScale/ops-lab1-12/actions/runs/39238364986) | PR #6 | 13 秒 | `ci` job：2026-10-19 18:34:03～18:34:16（北京时间），成功；不含排队时间。 |
-| [ci #18 / 39240920512](https://github.com/KanaScale/ops-lab1-12/actions/runs/39240920512) | push main（PR #6 squash 合并） | 17 秒 | `ci` job：2026-10-19 18:55:31～18:55:48（北京时间），成功并上传主干制品；不含排队时间。 |
 | [ci #11 / 39223510487](https://github.com/KanaScale/ops-lab1-12/actions/runs/39223510487) | PR #4（仅有缺陷） | 9 秒 | `ci` job：2026-10-19 16:32:41～16:32:50（北京时间），成功；不含排队时间。 |
 | [ci #12 / 39224774268](https://github.com/KanaScale/ops-lab1-12/actions/runs/39224774268) | PR #4（补充测试） | 16 秒 | `ci` job：2026-10-19 16:43:17～16:43:33（北京时间），测试失败；不含排队时间。 |
 | [ci #13 / 39225332486](https://github.com/KanaScale/ops-lab1-12/actions/runs/39225332486) | PR #4（撤销缺陷） | 10 秒 | `ci` job：2026-10-19 16:47:54～16:48:04（北京时间），成功；不含排队时间。 |
+| [ci #17 / 39238364986](https://github.com/KanaScale/ops-lab1-12/actions/runs/39238364986) | PR #6 | 13 秒 | `ci` job：2026-10-19 18:34:03～18:34:16（北京时间），成功；不含排队时间。 |
+| [ci #18 / 39240920512](https://github.com/KanaScale/ops-lab1-12/actions/runs/39240920512) | push main（PR #6 squash 合并） | 17 秒 | `ci` job：2026-10-19 18:55:31～18:55:48（北京时间），成功并上传主干制品；不含排队时间。 |
 
 ## 6. 分析问题
 
@@ -161,26 +161,32 @@ exit_code=0
 
 **问题 1：gate 的收益与成本。** 两轮演练中，gate 拦住了什么，没有拦住什么？用第 5 节的时间线计算：第一轮因失败多花了多少时间，其中等待 `ci` 的时间和人工修改的时间各占多少？一次 `ci` 大约需要多久，在“提交到发布的间隔”中占多大比例？第二轮补充测试之后，还有哪类问题是测试本身无法发现的？
 
-<填写>
+所用数据：第 3 节 [PR #2](https://github.com/KanaScale/ops-lab1-12/pull/2) 和 [PR #4](https://github.com/KanaScale/ops-lab1-12/pull/4) 的检查记录、第 5 节第一轮时间线、五次 ci job 时长（9、16、10、13、17 秒）及 #4、#5、#6 的提交到发布间隔（1 小时 18 分 39 秒、17 分 30 秒、27 分 34 秒）。
+
+第一轮的 gate 拦住了现有测试能发现的单双周误判，第二轮仅含单节课程缺陷时 ci 却通过，补上边界测试后才拦住它。从第一轮 PR 创建的 15:08:46 到首次失败反馈的 15:08:59 用了 13 秒，到修复后通过的 15:10:59 共 2 分 13 秒；若以首次失败到再次通过为额外延迟口径，则是 2 分钟。其中失败后人工修改至修复提交的 15:10:38 约 99 秒，提交到新运行创建的 15:10:43 约 5 秒，新运行给出通过结果再用 16 秒；首次失败前另有 13 秒反馈等待。这五次 ci job 平均 13 秒，单次约占上述三个提交到发布间隔的 0.28%、1.24%、0.79%，但这个比例不含排队、人工审批和发布工作流。补测试只改善已知边界的检测，对未写入断言的行为、部署配置、兼容性及制品来源问题仍不能保证发现；这些数字仅代表本仓库当时的 runner 与小规模测试。
 
 **问题 2：PR 中的构建与 main 上的构建。** 在 PR 触发的运行日志中，`github.sha` 与 `pull_request.head.sha` 是否相同？它们能否在 main 的历史中找到？答案与合并方式有关，请写明本组使用的方式。合并之后，main 上这次改动的提交号是哪个？据此说明，为什么待发布的制品只能从 main 上的提交或 tag 构建。
 
-<填写>
+所用数据：[PR #4 的 ci #13 日志](https://github.com/KanaScale/ops-lab1-12/actions/runs/39225332486/job/117970107953) 打印 github.sha=6dfdbc6cf7ad57dcd865934539f90fbc8e06e08c、pull_request.head.sha=332e05fb1c22c982ad6b3754f44a9012691fbeb6；[PR #4](https://github.com/KanaScale/ops-lab1-12/pull/4) 合入后的 main 提交是 [7b2cf19](https://github.com/KanaScale/ops-lab1-12/commit/7b2cf19f6e8b04555439a702724ee1381263420e)。
+
+这两个 SHA 不相同：前者是 GitHub 为 PR 合并结果生成的临时提交，后者是 PR 分支实际提交。检查 main 的提交历史，两者都不在其中，因为本组使用 squash 合并，GitHub 为最终改动创建了新的 7b2cf19 提交。PR 的 ci 因此验证的是待合并结果，却不能把该临时提交或分支头直接当作已经进入 main 的发布来源。待发布制品应以经过审批和主干检查的 main 提交或指向它的 tag 构建，才能让 BUILD_INFO、Release 和仓库历史对应起来。以上 SHA 关系基于本组的 pull_request 检查与 squash 合并方式；换用其他合并方式时，历史中的提交关系需重新核对。
 
 **问题 3：可重复构建。** 在本地同一个提交上按下表构建，记录哈希值。④、⑤ 需临时去掉 Makefile 中 tar 的 `--mtime=@0`，完成后用 `git checkout -- Makefile` 恢复，不要提交。
 
 | 构建 | 条件 | 二进制 sha256 | tar.gz sha256 |
 |---|---|---|---|
-| ① | `make package`，`VERSION`、`BUILD_NO`、`RUN_ID`、`COMMIT` 均指定固定值 | <填写> | <填写> |
-| ② | 与 ① 完全相同，再构建一次 | <填写> | <填写> |
-| ③ | 仅将 `BUILD_NO` 换成另一个值 | <填写> | <填写> |
-| ④ | 去掉 `--mtime=@0`，其余同 ① | <填写> | <填写> |
-| ⑤ | 同 ④，间隔几秒后再构建一次 | <填写> | <填写> |
-| Actions | 对 main 上的一次 push 运行执行 Re-run all jobs，比较两次尝试中 package 步骤打印的值 | <两次的值> | <两次的值> |
+| ① | 固定 VERSION=lab1-repro、BUILD_NO=7、RUN_ID=lab1-fixed-run、COMMIT=39dfc1647bad9d714800ca4029faf13e0268d5c0 | 49e6126fadf1d3de99de533a109a0b00160d95cac226714d41255f1af071f833 | 8185125b5dacee92b6e24f67e92adb281cca84683f9d10175e8d148e78fd00d3 |
+| ② | 与 ① 完全相同，再构建一次 | 49e6126fadf1d3de99de533a109a0b00160d95cac226714d41255f1af071f833 | 8185125b5dacee92b6e24f67e92adb281cca84683f9d10175e8d148e78fd00d3 |
+| ③ | 仅将 BUILD_NO 改为 8 | 8e82b4503de5a6ce61da46675cd50ba8a9d6a08ef50bbade397ba57306ed820b | 241d1240c9a59c81b3a442296967594ef9040cfbfb238d997a6381e2295924a5 |
+| ④ | 临时去掉 Makefile 中的 --mtime=@0，其余同 ① | 49e6126fadf1d3de99de533a109a0b00160d95cac226714d41255f1af071f833 | af43fc7064899ffde9fece9b16e197e9fe83fbba1303ab04c6e4fc38a6ae4f1a |
+| ⑤ | 同 ④，间隔 3 秒再次构建 | 49e6126fadf1d3de99de533a109a0b00160d95cac226714d41255f1af071f833 | 6a3d85f81734e680c8558f03c5a758a456fb3b74f261aab3b80feeb9a6a6ee07 |
+| Actions | [main 的 ci 运行 39227100247](https://github.com/KanaScale/ops-lab1-12/actions/runs/39227100247)，比较首次与 Re-run all jobs | 尝试 1、2 均为 48a85fa25c0994e7661cbad9d419350b5f0fa2dcd1f9e40e28db49664e9bbb5e | 尝试 1、2 均为 18f0e8c62030fa1a8d69b107a8893061888d096c824093815475b8ff6c51ca51 |
 
 哪些相同、哪些不同，原因分别是什么？④ 的二进制文件与 ① 是否相同？如果不同，请结合任务 0 中看到的 vcs 信息分析。据此说明制品中应当包含什么、不应包含什么。另外，`release` 在同一个提交上再次编译，而没有直接发布 `ci` 产出的主干制品：为什么这样做？这与 L-05 第 11 页的“一次构建、多处部署”是否冲突，代价是什么？
 
-<填写>
+所用数据：在提交 39dfc1647bad9d714800ca4029faf13e0268d5c0 的独立、干净工作树中，以 Go 1.26.9、linux/amd64 和表中的固定参数构建；④、⑤只临时删除 Makefile 中的归档时间参数，⑤与④相隔 3 秒，完成后已恢复 Makefile 且工作树干净；Actions 对比的是同一运行的第 1、2 次尝试。
+
+①②的二进制和归档哈希都相同，说明在这组固定输入下可重复；③改变 BUILD_NO 后，链接参数写入二进制、BUILD_INFO 写入归档，两者哈希都变化。④的二进制与①相同，而归档哈希不同；⑤的二进制仍相同、归档又变，因为去掉 --mtime=@0 后文件修改时间进入 tar，重新构建会改变归档字节。本次实验二进制的 go version -m 没有显示 vcs 字段，因此不能把任务 0 里观察到的 vcs.modified 行为直接套用到这次构建；是否把工作区状态嵌入二进制应以实际构建结果检查。主干 ci 重跑的两次尝试对同一提交使用相同的 VERSION、BUILD_NO、RUN_ID、COMMIT，打印出的二进制和归档哈希也分别完全相同。制品应明确包含版本、提交、构建号和可定位运行的标识，并提供独立保存的校验值；应避免把未经控制的构建时间、主机路径或未提交改动当成可复现输入。release 在同一提交重新编译，是因为它要把 tag 对应的正式版本号写进二进制，而 main 的 ci 制品写的是 0.0.0-main；这与严格的一次构建、多处部署不一致，代价是额外构建时间及两次构建环境漂移的风险，需要用固定工具链和构建参数减轻，但不能把两个不同版本参数的二进制称为同一制品。
 
 **问题 4：发布与回退。** 假设 v1.0.1 发布后发现缺陷，应当如何处理？为什么不应删除 v1.0.1 的 tag、再用同一版本号重新发布？任务 6 中将服务从 v1.0.1 切换回 v1.0.0 时，使用的是哪个文件，是否需要重新构建？请用两次 `/version` 的输出说明。如果改为从源码重新构建 v1.0.0，得到的文件与原附件是否相同（参考问题 3）？最后，如果有人删除 v1.0.0 的附件，换上一个新文件和对应的新 `.sha256`，`trace.sh` 能否发现？本组在第 4 节记录的值能否发现？可以查阅 GitHub 的 Immutable releases 设置的用途。
 
@@ -192,9 +198,9 @@ exit_code=0
 
 | 选做 | 完成情况与证据 |
 |---|---|
-| O1 容器镜像 | <未做 / 链接、镜像摘要（digest）、运行容器的主机架构> |
-| O2 缓存对反馈时间的影响 | <未做 / 预期、数据与结论> |
-| O3 迁移到小组项目 | <未做 / 仓库链接> |
+| O1 容器镜像 | 未做 |
+| O2 缓存对反馈时间的影响 | 未做 |
+| O3 迁移到小组项目 | 未做 |
 
 ## 8. 成员贡献
 
@@ -202,4 +208,7 @@ exit_code=0
 
 | GitHub 用户名 | 发起并合入的 PR 编号 | 审批过的 PR 编号 |
 |---|---|---|
-| CynicDora | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6) | [#2](https://github.com/KanaScale/ops-lab1-12/pull/2) |
+| KanaScale | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3) | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7) |
+| CynicDora | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7) | [#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3) |
+| fireDragon198 | [#4](https://github.com/KanaScale/ops-lab1-12/pull/4) | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6) |
+| Har0v0i86 | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5) | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#4](https://github.com/KanaScale/ops-lab1-12/pull/4) |
