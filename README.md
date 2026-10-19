@@ -16,6 +16,8 @@
 | `GET /version` | 返回版本号、提交号、构建号、Go 版本（JSON） |
 | `POST /api/conflict` | 请求体 `{"a": 教学班, "b": 教学班}`，返回 `{"conflict": true/false}` |
 
+`GET /version` 返回 `Cache-Control: no-store`，要求客户端和中间缓存不要保存该响应，便于在发布或回退后核对当前进程的版本。
+
 教学班的字段：`id`、`weekday`（1～7）、`start`、`end`（节次，含）、`weeks`。
 
 ## 在本地运行
@@ -42,4 +44,4 @@ dist/enroll-conflict_1.0.0_linux_amd64/enroll-conflict -version
 | `Dockerfile` | 选做 O1 使用 |
 | `LAB1.md` | 小组的证据与分析记录，需要填写并提交 |
 
-仓库中没有 `.github/workflows/`：流水线由小组在实验中自行编写。
+`.github/workflows/ci.yml` 是小组编写的 CI 工作流：PR 执行质量检查，推送到 main 后还会打包并上传保留 14 天的主干制品。

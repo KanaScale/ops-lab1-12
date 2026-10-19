@@ -36,7 +36,7 @@
 | 第二轮：补测试后失败的运行 | <链接> |
 | 第二轮：撤销缺陷后通过的运行 | <链接> |
 | 未合入分支上的 tag 被 release gate 拒绝的运行 | <链接> |
-| Release v1.0.0 | <链接> |
+| Release v1.0.0 | [v1.0.0](https://github.com/KanaScale/ops-lab1-12/releases/tag/v1.0.0)，发布于 2026-10-19 17:40:27（北京时间）；任务 6 发布前的附件复核见第 4 节。 |
 | Release v1.0.1 | <链接> |
 
 ## 4. 追溯与运行
@@ -45,21 +45,41 @@
 
 | 项 | v1.0.0 | v1.0.1 |
 |---|---|---|
-| 版本号 | <填写> | <填写> |
-| 构建号 | <填写> | <填写> |
-| 提交号（SHA） | <填写> | <填写> |
-| 引入该提交的 PR | <编号与链接> | <编号与链接> |
-| 构建它的 Actions 运行（`trace.sh` 给出的链接） | <链接> | <链接> |
-| 制品 sha256（发布当时，取自 Release 里的 .sha256） | <填写> | <填写> |
+| 版本号 | 1.0.0 | <填写> |
+| 构建号 | 1 | <填写> |
+| 提交号（SHA） | `f03b6ea350257855fb5862eacaff5efcfcee81f0` | <填写> |
+| 引入该提交的 PR | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5) | <编号与链接> |
+| 构建它的 Actions 运行（`trace.sh` 给出的链接） | [release #1 / run_id 39231789999](https://github.com/KanaScale/ops-lab1-12/actions/runs/39231789999) | <链接> |
+| 制品 sha256（发布当时，取自 Release 里的 .sha256） | `ad67bf9b7ee40853a874b1e8ebedb7c676ee0e4ba8c70d49bef426d39c577870` | <填写> |
 
-仅凭构建号能否唯一确定是哪次运行？v1.0.0 的构建号在 `ci` 和 `release` 的运行列表中各对应哪次运行？<填写>
+v1.0.0 的上述 SHA-256 取自发布附件的 `.sha256`，并在 2026-10-19 18:27:48（北京时间，发布 v1.0.1 之前）重新下载核验为一致，作为后续回退的独立对照值；采集主机为 Ubuntu / x86_64。
+
+仅凭构建号不能唯一确定是哪次运行。v1.0.0 的构建号为 1，分别存在 [ci #1 / run_id 39020295552](https://github.com/KanaScale/ops-lab1-12/actions/runs/39020295552) 和 [release #1 / run_id 39231789999](https://github.com/KanaScale/ops-lab1-12/actions/runs/39231789999)。两个工作流各自编号，须使用 `BUILD_INFO` 中的 `run_id` 定位实际构建。
 
 发布 v1.0.1 之后重新下载 v1.0.0 的附件，计算得到的 sha256：<填写>。与上表中发布当时的值是否一致？<填写>
 
 `trace.sh` 输出（v1.0.0）：
 
 ```text
-<粘贴>
+== 1. 校验和
+enroll-conflict_1.0.0_linux_amd64.tar.gz: OK
+== 2. 制品里的 BUILD_INFO
+name=enroll-conflict
+version=1.0.0
+build_no=1
+run_id=39231789999
+commit=f03b6ea350257855fb5862eacaff5efcfcee81f0
+go=go1.26.9
+== 3. 提交 f03b6ea350257855fb5862eacaff5efcfcee81f0
+作者: Har0v0i86 <564197920@qq.com>
+时间: 2026-10-19T17:38:36+08:00
+标题: feat: add tag-triggered release workflow (#5)
+主干: 该提交在 origin/main 的历史上
+指向它的 tag: v1.0.0
+版本号: 1.0.0    构建号: 1
+提交页面（含关联的 PR）: https://github.com/KanaScale/ops-lab1-12/commit/f03b6ea350257855fb5862eacaff5efcfcee81f0
+构建它的运行: https://github.com/KanaScale/ops-lab1-12/actions/runs/39231789999
+exit_code=0
 ```
 
 `trace.sh` 输出（v1.0.1）：
