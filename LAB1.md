@@ -186,7 +186,36 @@ exit_code=0
 
 所用数据：在提交 39dfc1647bad9d714800ca4029faf13e0268d5c0 的独立、干净工作树中，以 Go 1.26.9、linux/amd64 和表中的固定参数构建；④、⑤只临时删除 Makefile 中的归档时间参数，⑤与④相隔 3 秒，完成后已恢复 Makefile 且工作树干净；Actions 对比的是同一运行的第 1、2 次尝试。
 
-①②的二进制和归档哈希都相同，说明在这组固定输入下可重复；③改变 BUILD_NO 后，链接参数写入二进制、BUILD_INFO 写入归档，两者哈希都变化。④的二进制与①相同，而归档哈希不同；⑤的二进制仍相同、归档又变，因为去掉 --mtime=@0 后文件修改时间进入 tar，重新构建会改变归档字节。本次实验二进制的 go version -m 没有显示 vcs 字段，因此不能把任务 0 里观察到的 vcs.modified 行为直接套用到这次构建；是否把工作区状态嵌入二进制应以实际构建结果检查。主干 ci 重跑的两次尝试对同一提交使用相同的 VERSION、BUILD_NO、RUN_ID、COMMIT，打印出的二进制和归档哈希也分别完全相同。制品应明确包含版本、提交、构建号和可定位运行的标识，并提供独立保存的校验值；应避免把未经控制的构建时间、主机路径或未提交改动当成可复现输入。release 在同一提交重新编译，是因为它要把 tag 对应的正式版本号写进二进制，而 main 的 ci 制品写的是 0.0.0-main；这与严格的一次构建、多处部署不一致，代价是额外构建时间及两次构建环境漂移的风险，需要用固定工具链和构建参数减轻，但不能把两个不同版本参数的二进制称为同一制品。
+复核独立工作树的构建环境：`go version` 为 `go1.26.9 linux/amd64`，`go env GOFLAGS` 输出空行（未设置额外 Go 构建参数），`go env GOMOD` 指向该工作树内的 `go.mod`；①构建前 `git status --short` 为空，④构建时显示 ` M Makefile`。该工作树的 `.git` 是内容形如 `gitdir: /home/kanascale/ops-lab1-12/.git/worktrees/lab1-review.CM74mq` 的文件。①和④分别执行 `go version -m dist/enroll-conflict_lab1-repro_linux_amd64/enroll-conflict` 的完整输出如下（两次输出相同）：
+
+```text
+①
+dist/enroll-conflict_lab1-repro_linux_amd64/enroll-conflict: go1.26.9
+	path	enroll-conflict
+	mod	enroll-conflict	(devel)
+	build	-buildmode=exe
+	build	-compiler=gc
+	build	-trimpath=true
+	build	CGO_ENABLED=0
+	build	GOARCH=amd64
+	build	GOOS=linux
+	build	GOAMD64=v1
+④
+dist/enroll-conflict_lab1-repro_linux_amd64/enroll-conflict: go1.26.9
+	path	enroll-conflict
+	mod	enroll-conflict	(devel)
+	build	-buildmode=exe
+	build	-compiler=gc
+	build	-trimpath=true
+	build	CGO_ENABLED=0
+	build	GOARCH=amd64
+	build	GOOS=linux
+	build	GOAMD64=v1
+```
+
+差异原因已在同机交叉验证：该 Go 版本的默认 VCS 探测只把目录形式的 `.git` 识别为 Git 根目录，独立 worktree 的 `.git` 文件不满足条件，因此这两次没有写入 `vcs.*`，④ 修改 Makefile 也没有改变二进制。改用同一提交、同一构建参数和 Go 1.26.9 的普通 `git clone`（`.git` 为目录）时，`GOFLAGS` 仍为空，①二进制哈希为 `9434e5926ec5090b39b327ac60c4c0cb63c09ad68828ba2a346495bcc9b2339c`、`vcs.modified=false`；④哈希变为 `ecdfa7beb7277fbb2b859b98b4fbad746a49086cf9dc0f15eb010383516bb8d3`、`vcs.modified=true`。因此组员在普通检出中观察到①与④二进制不同，与本表的独立工作树结果并不矛盾；即使提交和 Makefile 命令相同，检出形式也会影响嵌入的 Go 构建元数据，不能跨环境直接比较二进制哈希。
+
+①②的二进制和归档哈希都相同，说明在这组固定输入下可重复；③改变 BUILD_NO 后，链接参数写入二进制、BUILD_INFO 写入归档，两者哈希都变化。④的二进制与①相同，而归档哈希不同；⑤的二进制仍相同、归档又变，因为去掉 --mtime=@0 后文件修改时间进入 tar，重新构建会改变归档字节。本表的独立工作树构建未写入 vcs 字段；在普通检出中，未提交的 Makefile 修改则使 vcs.modified 从 false 变为 true，并改变二进制。是否把工作区状态嵌入二进制须以实际检出形式和构建元数据判断。主干 ci 重跑的两次尝试对同一提交使用相同的 VERSION、BUILD_NO、RUN_ID、COMMIT，打印出的二进制和归档哈希也分别完全相同。制品应明确包含版本、提交、构建号和可定位运行的标识，并提供独立保存的校验值；应避免把未经控制的构建时间、主机路径或未提交改动当成可复现输入。release 在同一提交重新编译，是因为它要把 tag 对应的正式版本号写进二进制，而 main 的 ci 制品写的是 0.0.0-main；这与严格的一次构建、多处部署不一致，代价是额外构建时间及两次构建环境漂移的风险，需要用固定工具链和构建参数减轻，但不能把两个不同版本参数的二进制称为同一制品。
 
 **问题 4：发布与回退。** 假设 v1.0.1 发布后发现缺陷，应当如何处理？为什么不应删除 v1.0.1 的 tag、再用同一版本号重新发布？任务 6 中将服务从 v1.0.1 切换回 v1.0.0 时，使用的是哪个文件，是否需要重新构建？请用两次 `/version` 的输出说明。如果改为从源码重新构建 v1.0.0，得到的文件与原附件是否相同（参考问题 3）？最后，如果有人删除 v1.0.0 的附件，换上一个新文件和对应的新 `.sha256`，`trace.sh` 能否发现？本组在第 4 节记录的值能否发现？可以查阅 GitHub 的 Immutable releases 设置的用途。
 
