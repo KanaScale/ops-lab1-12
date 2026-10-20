@@ -175,47 +175,20 @@ exit_code=0
 
 | 构建 | 条件 | 二进制 sha256 | tar.gz sha256 |
 |---|---|---|---|
-| ① | 固定 VERSION=lab1-repro、BUILD_NO=7、RUN_ID=lab1-fixed-run、COMMIT=39dfc1647bad9d714800ca4029faf13e0268d5c0 | 49e6126fadf1d3de99de533a109a0b00160d95cac226714d41255f1af071f833 | 8185125b5dacee92b6e24f67e92adb281cca84683f9d10175e8d148e78fd00d3 |
-| ② | 与 ① 完全相同，再构建一次 | 49e6126fadf1d3de99de533a109a0b00160d95cac226714d41255f1af071f833 | 8185125b5dacee92b6e24f67e92adb281cca84683f9d10175e8d148e78fd00d3 |
-| ③ | 仅将 BUILD_NO 改为 8 | 8e82b4503de5a6ce61da46675cd50ba8a9d6a08ef50bbade397ba57306ed820b | 241d1240c9a59c81b3a442296967594ef9040cfbfb238d997a6381e2295924a5 |
-| ④ | 临时去掉 Makefile 中的 --mtime=@0，其余同 ① | 49e6126fadf1d3de99de533a109a0b00160d95cac226714d41255f1af071f833 | af43fc7064899ffde9fece9b16e197e9fe83fbba1303ab04c6e4fc38a6ae4f1a |
-| ⑤ | 同 ④，间隔 3 秒再次构建 | 49e6126fadf1d3de99de533a109a0b00160d95cac226714d41255f1af071f833 | 6a3d85f81734e680c8558f03c5a758a456fb3b74f261aab3b80feeb9a6a6ee07 |
-| Actions | [main 的 ci 运行 39227100247](https://github.com/KanaScale/ops-lab1-12/actions/runs/39227100247)，比较首次与 Re-run all jobs | 尝试 1、2 均为 48a85fa25c0994e7661cbad9d419350b5f0fa2dcd1f9e40e28db49664e9bbb5e | 尝试 1、2 均为 18f0e8c62030fa1a8d69b107a8893061888d096c824093815475b8ff6c51ca51 |
+| ① | 固定 `VERSION=9.9.9`、`BUILD_NO=100`、`RUN_ID=123456`、`COMMIT=f03b6ea350257855fb5862eacaff5efcfcee81f0` | `3fd60c2a89934e66ac012549144a4862fc2462887f7dfe341c6f23a22b27a39d` | `564c6a59cce16533f452a2a9ad5607b35f076cf9b290717bdcbcc690ceeece8b` |
+| ② | 与①完全相同，再构建一次 | `3fd60c2a89934e66ac012549144a4862fc2462887f7dfe341c6f23a22b27a39d` | `564c6a59cce16533f452a2a9ad5607b35f076cf9b290717bdcbcc690ceeece8b` |
+| ③ | 仅将 `BUILD_NO` 改为 `101` | `4bf128a3c5561e24d9c7731635823914d241a6e85b22f1aa807ae3251382463b` | `d248ffeef3ec9dc2c5517ca9328a2517c68154c02cb1a12b0ef241278dd15531` |
+| ④ | 临时去掉 Makefile 中的 `--mtime=@0`，其余同① | `934c1b096ced6d32947f3cb45d0c12be65a966406668b24988571ce16ac6dd81` | `a32ca6e0073a364b779122b6c3cc9bd2ddbc6e96408552d950fa30c1c28a3719` |
+| ⑤ | 同④，间隔数秒再次构建 | `934c1b096ced6d32947f3cb45d0c12be65a966406668b24988571ce16ac6dd81` | `1b00d7df348fc47d6c3bf0b328f0c4cb3d152f0792ecaf41394214aa6b6216e0` |
+| Actions | [main 的 ci 运行 39227100247](https://github.com/KanaScale/ops-lab1-12/actions/runs/39227100247)，比较首次与 Re-run all jobs | 两次均为 `48a85fa25c0994e7661cbad9d419350b5f0fa2dcd1f9e40e28db49664e9bbb5e` | 两次均为 `18f0e8c62030fa1a8d69b107a8893061888d096c824093815475b8ff6c51ca51` |
 
 哪些相同、哪些不同，原因分别是什么？④ 的二进制文件与 ① 是否相同？如果不同，请结合任务 0 中看到的 vcs 信息分析。据此说明制品中应当包含什么、不应包含什么。另外，`release` 在同一个提交上再次编译，而没有直接发布 `ci` 产出的主干制品：为什么这样做？这与 L-05 第 11 页的“一次构建、多处部署”是否冲突，代价是什么？
 
-所用数据：在提交 39dfc1647bad9d714800ca4029faf13e0268d5c0 的独立、干净工作树中，以 Go 1.26.9、linux/amd64 和表中的固定参数构建；④、⑤只临时删除 Makefile 中的归档时间参数，⑤与④相隔 3 秒，完成后已恢复 Makefile 且工作树干净；Actions 对比的是同一运行的第 1、2 次尝试。
+所用数据：组员 fireDragon198 在普通仓库检出中记录上述①～⑤：main 提交 `f03b6ea350257855fb5862eacaff5efcfcee81f0`，WSL `linux/amd64`，Go `1.26.9`，①②使用表内固定参数，④⑤只临时修改 Makefile 且事后恢复。`go version -m` 中①为 `vcs=git`、`vcs.revision=f03b6ea350257855fb5862eacaff5efcfcee81f0`、`vcs.time=2026-10-19T09:38:36Z`、`vcs.modified=false`；④的 revision 和 time 相同，但 `vcs.modified=true`。Actions 是同一 main push 运行的两次 attempt，`run_number` 和 `run_id` 相同，仅 `run_attempt` 变化。原始记录未保存 `GOFLAGS`、本地 tag 列表及 tar/gzip 等工具版本，故表中哈希是本组当时实测值，不保证换一个检出环境后逐字节相同。
 
-复核独立工作树的构建环境：`go version` 为 `go1.26.9 linux/amd64`，`go env GOFLAGS` 输出空行（未设置额外 Go 构建参数），`go env GOMOD` 指向该工作树内的 `go.mod`；①构建前 `git status --short` 为空，④构建时显示 ` M Makefile`。该工作树的 `.git` 是内容形如 `gitdir: /home/kanascale/ops-lab1-12/.git/worktrees/lab1-review.CM74mq` 的文件。①和④分别执行 `go version -m dist/enroll-conflict_lab1-repro_linux_amd64/enroll-conflict` 的完整输出如下（两次输出相同）：
+复核时，在相同提交、构建参数和 Go 1.26.9 的普通克隆中，暂时隐藏后来创建的 `v1.0.0` tag 后，①与④的二进制哈希分别复现为 `3fd60c2a…a39d` 和 `934c1b09…dd81`；该 tag 可见时，Go 写入的模块版本信息不同，哈希也会变化。先前独立 `git worktree` 的 `.git` 为指向主仓库的文件，在本机 Go 1.26.9 下未写入 `vcs.*`，因此其④二进制没有变化；本表统一采用组员普通检出的原始记录。压缩包哈希在本次跨检出复核中未逐字节复现，表中保留组员原始测量值。
 
-```text
-①
-dist/enroll-conflict_lab1-repro_linux_amd64/enroll-conflict: go1.26.9
-	path	enroll-conflict
-	mod	enroll-conflict	(devel)
-	build	-buildmode=exe
-	build	-compiler=gc
-	build	-trimpath=true
-	build	CGO_ENABLED=0
-	build	GOARCH=amd64
-	build	GOOS=linux
-	build	GOAMD64=v1
-④
-dist/enroll-conflict_lab1-repro_linux_amd64/enroll-conflict: go1.26.9
-	path	enroll-conflict
-	mod	enroll-conflict	(devel)
-	build	-buildmode=exe
-	build	-compiler=gc
-	build	-trimpath=true
-	build	CGO_ENABLED=0
-	build	GOARCH=amd64
-	build	GOOS=linux
-	build	GOAMD64=v1
-```
-
-差异原因已在同机交叉验证：该 Go 版本的默认 VCS 探测只把目录形式的 `.git` 识别为 Git 根目录，独立 worktree 的 `.git` 文件不满足条件，因此这两次没有写入 `vcs.*`，④ 修改 Makefile 也没有改变二进制。改用同一提交、同一构建参数和 Go 1.26.9 的普通 `git clone`（`.git` 为目录）时，`GOFLAGS` 仍为空，①二进制哈希为 `9434e5926ec5090b39b327ac60c4c0cb63c09ad68828ba2a346495bcc9b2339c`、`vcs.modified=false`；④哈希变为 `ecdfa7beb7277fbb2b859b98b4fbad746a49086cf9dc0f15eb010383516bb8d3`、`vcs.modified=true`。因此组员在普通检出中观察到①与④二进制不同，与本表的独立工作树结果并不矛盾；即使提交和 Makefile 命令相同，检出形式也会影响嵌入的 Go 构建元数据，不能跨环境直接比较二进制哈希。
-
-①②的二进制和归档哈希都相同，说明在这组固定输入下可重复；③改变 BUILD_NO 后，链接参数写入二进制、BUILD_INFO 写入归档，两者哈希都变化。④的二进制与①相同，而归档哈希不同；⑤的二进制仍相同、归档又变，因为去掉 --mtime=@0 后文件修改时间进入 tar，重新构建会改变归档字节。本表的独立工作树构建未写入 vcs 字段；在普通检出中，未提交的 Makefile 修改则使 vcs.modified 从 false 变为 true，并改变二进制。是否把工作区状态嵌入二进制须以实际检出形式和构建元数据判断。主干 ci 重跑的两次尝试对同一提交使用相同的 VERSION、BUILD_NO、RUN_ID、COMMIT，打印出的二进制和归档哈希也分别完全相同。制品应明确包含版本、提交、构建号和可定位运行的标识，并提供独立保存的校验值；应避免把未经控制的构建时间、主机路径或未提交改动当成可复现输入。release 在同一提交重新编译，是因为它要把 tag 对应的正式版本号写进二进制，而 main 的 ci 制品写的是 0.0.0-main；这与严格的一次构建、多处部署不一致，代价是额外构建时间及两次构建环境漂移的风险，需要用固定工具链和构建参数减轻，但不能把两个不同版本参数的二进制称为同一制品。
+①②的二进制和归档哈希均相同，说明在组员当时固定的构建输入下能够重复；③仅改变构建号，链接参数和 `BUILD_INFO` 随之改变，所以两个哈希都变化。④的二进制与①不同，正如任务 0 所见，未提交的 Makefile 修改使 Go 自动记录的 `vcs.modified` 从 `false` 变为 `true`；取消固定归档时间又使 tar.gz 改变。⑤与④的二进制相同，但归档哈希不同，说明不固定文件修改时间会破坏压缩包的字节重复性。Actions 重跑两次的哈希均相同，因为该运行的提交、构建号和运行号不变，而 attempt 未写入制品。制品应记录版本、提交、构建号、运行号和工具链等追溯信息，并避免无控制的构建时间、绝对路径及文件元数据；复现时还须控制 Go 构建选项、Git 状态与 tag 可见性。`release` 重新编译是为了将正式 tag 版本号写入二进制和 `BUILD_INFO`，而 main CI 制品使用 `0.0.0-main`。因此本实验没有严格实现“一次构建、多处部署”，代价是额外构建时间以及两次环境或产物不一致的风险；以上结论只在相应源码、工具链、依赖、构建参数和打包环境可比时成立。
 
 **问题 4：发布与回退。** 假设 v1.0.1 发布后发现缺陷，应当如何处理？为什么不应删除 v1.0.1 的 tag、再用同一版本号重新发布？任务 6 中将服务从 v1.0.1 切换回 v1.0.0 时，使用的是哪个文件，是否需要重新构建？请用两次 `/version` 的输出说明。如果改为从源码重新构建 v1.0.0，得到的文件与原附件是否相同（参考问题 3）？最后，如果有人删除 v1.0.0 的附件，换上一个新文件和对应的新 `.sha256`，`trace.sh` 能否发现？本组在第 4 节记录的值能否发现？可以查阅 GitHub 的 Immutable releases 设置的用途。
 
