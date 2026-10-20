@@ -201,7 +201,7 @@ exit_code=0
 | 选做 | 完成情况与证据 |
 |---|---|
 | O1 容器镜像 | 已完成：[#9](https://github.com/KanaScale/ops-lab1-12/pull/9) 合入工作流；[v1.0.2 发布与镜像运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383152714) 均成功。摘要、架构和匿名拉取结果见下方。 |
-| O2 缓存对反馈时间的影响 | 未做 |
+| O2 缓存对反馈时间的影响 | 已完成：[缓存开启 PR #10 的 CI](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383771520) 与[缓存关闭、保持未合并的 PR #11](https://github.com/KanaScale/ops-lab1-12/pull/11) 各运行 6 次；逐次数据和分析见下方。 |
 | O3 迁移到小组项目 | 未做 |
 
 ### O1 镜像发布与运行证据
@@ -220,13 +220,36 @@ docker run -d --rm -p 127.0.0.1:18080:8080 ghcr.io/kanascale/ops-lab1-12@sha256:
 
 发布 job 使用仓库的 `GITHUB_TOKEN` 创建 Release；按 [GitHub 的工作流触发规则](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow)，该令牌引起的普通 Release 事件不会再启动另一个工作流，所以镜像 job 使用 `needs: release` 接在同一个 `release.yml` 中。Dockerfile 的 `org.opencontainers.image.source` 标签用于关联仓库；GHCR 包的实际匿名可拉取性以上述独立客户端检查为准，而不只凭仓库是否公开推断。
 
+### O2 缓存对 CI 反馈时间的影响
+
+**预期与方法。** 本示例没有第三方 Go 依赖，模块下载缓存预计收益很小；但 Go 构建缓存仍可能减少标准库编译、`go vet` 和 `go test` 的时间。以 `actions/setup-go@v7` 默认缓存为实验组，以仅增加 `cache: false` 的 [PR #11](https://github.com/KanaScale/ops-lab1-12/pull/11) 为对照组。按照指导书，**PR #11 不合并**。为避免 main push 特有的打包和上传步骤混入比较，缓存组采用此前的 [PR #10 的 CI](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383771520)，无缓存组采用 [PR #11 的 CI](https://github.com/KanaScale/ops-lab1-12/actions/runs/39385120232)；两者都是 `pull_request` 事件，运行同名 `ci` job、Ubuntu 24.04 和 Go 1.26.9。两组业务代码和测试相同；两次 PR 的文档和缓存配置提交不同。两组分别执行初次运行及 5 次 `Re-run all jobs`，下表列出全部 12 次成功运行；主要比较只用两组各 5 次重跑（attempt 2～6），避免混入首次触发与重跑之间的差异。
+
+“反馈时间”取 GitHub Actions 每次 attempt 的 `updated_at - run_started_at`，即工作流开始至完成的秒数；另列 `ci` job 的 `completed_at - started_at`，以及 `setup-go` 步骤的时间。时间戳精度为秒，因此短步骤显示 0 秒不代表没有执行。表中每个 attempt 都链接到对应 job，可查看日志；缓存组 2～6 的日志均有 `Cache hit for` 和 `Cache restored successfully`，无缓存组 2～6 的日志均显示 `cache: false` 且无缓存命中。
+
+| 组别 | attempt / job 证据 | 反馈时间（秒） | job 时间（秒） | setup-go（秒） |
+|---|---|---:|---:|---:|
+| 有缓存，初次运行 | [1](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383771520/job/118498663820) | 17 | 14 | 2 |
+| 有缓存 | [2](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383771520/job/118528835135) | 18 | 14 | 3 |
+| 有缓存 | [3](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383771520/job/118529608369) | 14 | 10 | 2 |
+| 有缓存 | [4](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383771520/job/118529734882) | 14 | 11 | 1 |
+| 有缓存 | [5](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383771520/job/118529860243) | 28 | 24 | 9 |
+| 有缓存 | [6](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383771520/job/118530795374) | 14 | 10 | 2 |
+| 无缓存，初次运行 | [1](https://github.com/KanaScale/ops-lab1-12/actions/runs/39385120232/job/118503003810) | 30 | 27 | 2 |
+| 无缓存 | [2](https://github.com/KanaScale/ops-lab1-12/actions/runs/39385120232/job/118524287529) | 44 | 37 | 3 |
+| 无缓存 | [3](https://github.com/KanaScale/ops-lab1-12/actions/runs/39385120232/job/118524600583) | 33 | 29 | 1 |
+| 无缓存 | [4](https://github.com/KanaScale/ops-lab1-12/actions/runs/39385120232/job/118524851065) | 33 | 29 | 0 |
+| 无缓存 | [5](https://github.com/KanaScale/ops-lab1-12/actions/runs/39385120232/job/118525085419) | 30 | 27 | 1 |
+| 无缓存 | [6](https://github.com/KanaScale/ops-lab1-12/actions/runs/39385120232/job/118530926622) | 31 | 26 | 1 |
+
+**结果与局限。** attempt 2～6 的反馈时间：有缓存为 18、14、14、28、14 秒（均值 17.6、中位数 14、范围 14～28），无缓存为 44、33、33、30、31 秒（均值 34.2、中位数 33、范围 30～44）；本组样本的均值差为 16.6 秒。对应 job 均值为 13.8 与 29.6 秒。`setup-go` 本身在有缓存组反而平均耗时 3.4 秒，无缓存组为 1.2 秒；缓存收益主要体现在后续 `Vet`（平均 3.2 对 19.2 秒）与 `Test`（平均 0.8 对 3.2 秒）。这与“无第三方依赖仍可能受益于 Go 构建缓存”的预期一致，但不能把 16.6 秒当作稳定的加速承诺：各组只有 5 次重跑，执行时间不交错、提交并非逐字相同，共享 runner 负载和缓存服务延迟也会波动；有缓存组第 5 次的 `setup-go` 就花了 9 秒。计时还未包含 PR 创建到工作流启动之前的等待时间，不能代表真实团队从提交到获得反馈的完整周期。
+
 ## 8. 成员贡献
 
 每位成员一行，只填写 GitHub 用户名，无需填写姓名；行数应与小组人数一致。
 
 | GitHub 用户名 | 发起并合入的 PR 编号 | 审批过的 PR 编号 |
 |---|---|---|
-| KanaScale | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9) | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7) |
+| KanaScale | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9)、[#10](https://github.com/KanaScale/ops-lab1-12/pull/10)、[#12](https://github.com/KanaScale/ops-lab1-12/pull/12) | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7) |
 | CynicDora | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7) | [#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3) |
-| fireDragon198 | [#4](https://github.com/KanaScale/ops-lab1-12/pull/4) | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6) |
-| Har0v0i86 | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5) | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#4](https://github.com/KanaScale/ops-lab1-12/pull/4)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9) |
+| fireDragon198 | [#4](https://github.com/KanaScale/ops-lab1-12/pull/4) | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6)、[#12](https://github.com/KanaScale/ops-lab1-12/pull/12) |
+| Har0v0i86 | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5) | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#4](https://github.com/KanaScale/ops-lab1-12/pull/4)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9)、[#10](https://github.com/KanaScale/ops-lab1-12/pull/10) |
