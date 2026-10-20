@@ -249,7 +249,7 @@ docker run -d --rm -p 127.0.0.1:18080:8080 ghcr.io/kanascale/ops-lab1-12@sha256:
 
 | GitHub 用户名 | 发起并合入的 PR 编号 | 审批过的 PR 编号 |
 |---|---|---|
-| KanaScale | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9) | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7) |
+| KanaScale | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9)、[#10](https://github.com/KanaScale/ops-lab1-12/pull/10)、[#12](https://github.com/KanaScale/ops-lab1-12/pull/12) | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7) |
 | CynicDora | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7) | [#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3) |
 | fireDragon198 | [#4](https://github.com/KanaScale/ops-lab1-12/pull/4) | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6) |
-| Har0v0i86 | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5) | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#4](https://github.com/KanaScale/ops-lab1-12/pull/4)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9) |
+| Har0v0i86 | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5) | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#4](https://github.com/KanaScale/ops-lab1-12/pull/4)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9)、[#10](https://github.com/KanaScale/ops-lab1-12/pull/10)、[#12](https://github.com/KanaScale/ops-lab1-12/pull/12) |
