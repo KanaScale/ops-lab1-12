@@ -200,9 +200,25 @@ exit_code=0
 
 | 选做 | 完成情况与证据 |
 |---|---|
-| O1 容器镜像 | 未做 |
+| O1 容器镜像 | 已完成：[#9](https://github.com/KanaScale/ops-lab1-12/pull/9) 合入工作流；[v1.0.2 发布与镜像运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383152714) 均成功。摘要、架构和匿名拉取结果见下方。 |
 | O2 缓存对反馈时间的影响 | 未做 |
 | O3 迁移到小组项目 | 未做 |
+
+### O1 镜像发布与运行证据
+
+- `v1.0.2` 指向 main 提交 [`bf9c5943322be6dccf543a47aba0f08cbb615f4e`](https://github.com/KanaScale/ops-lab1-12/commit/bf9c5943322be6dccf543a47aba0f08cbb615f4e)。[Release](https://github.com/KanaScale/ops-lab1-12/releases/tag/v1.0.2) 由同一 [release 工作流](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383152714) 创建；随后 [image job](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383152714/job/118496799001) 下载正式附件，`sha256sum -c` 输出 `enroll-conflict_1.0.2_linux_amd64.tar.gz: OK`，并核对附件内 `BUILD_INFO` 的版本 `1.0.2`、提交 `bf9c5943322be6dccf543a47aba0f08cbb615f4e`。构建上下文是解包后的二进制与 `BUILD_INFO`，Dockerfile 只执行 `COPY`，镜像 job 没有重新编译。
+- GHCR 镜像 tag 为 `ghcr.io/kanascale/ops-lab1-12:v1.0.2`；本次推送产生的不可变摘要引用为 `ghcr.io/kanascale/ops-lab1-12@sha256:99a3084c81bcbbf77c102d4abb770cf9ce04d0f4bd81216de4328e403420e9f7`。实际运行的主机架构 `uname -m` 为 `x86_64`，拉取镜像后检查的平台为 `linux/amd64`。Actions 使用下列摘要引用运行容器，而非使用可变 tag：
+```bash
+docker run -d --rm -p 127.0.0.1:18080:8080 ghcr.io/kanascale/ops-lab1-12@sha256:99a3084c81bcbbf77c102d4abb770cf9ce04d0f4bd81216de4328e403420e9f7
+```
+
+- 容器的 `GET http://127.0.0.1:18080/version` 实测响应如下，与 v1.0.2 的提交、版本和 `BUILD_INFO` 一致。用空白 Docker 客户端配置对同一摘要执行匿名 `docker pull`，日志结果为 `Anonymous pull: yes`；因此该镜像在本次检查时无需登录即可拉取。
+
+```json
+{"version":"1.0.2","commit":"bf9c5943322be6dccf543a47aba0f08cbb615f4e","build_no":"4","go":"go1.26.9"}
+```
+
+发布 job 使用仓库的 `GITHUB_TOKEN` 创建 Release；按 [GitHub 的工作流触发规则](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow)，该令牌引起的普通 Release 事件不会再启动另一个工作流，所以镜像 job 使用 `needs: release` 接在同一个 `release.yml` 中。Dockerfile 的 `org.opencontainers.image.source` 标签用于关联仓库；GHCR 包的实际匿名可拉取性以上述独立客户端检查为准，而不只凭仓库是否公开推断。
 
 ## 8. 成员贡献
 
@@ -210,7 +226,7 @@ exit_code=0
 
 | GitHub 用户名 | 发起并合入的 PR 编号 | 审批过的 PR 编号 |
 |---|---|---|
-| KanaScale | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3) | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7) |
+| KanaScale | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9) | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7) |
 | CynicDora | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7) | [#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3) |
 | fireDragon198 | [#4](https://github.com/KanaScale/ops-lab1-12/pull/4) | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6) |
-| Har0v0i86 | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5) | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#4](https://github.com/KanaScale/ops-lab1-12/pull/4) |
+| Har0v0i86 | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5) | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#4](https://github.com/KanaScale/ops-lab1-12/pull/4)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9) |
