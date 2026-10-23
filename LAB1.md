@@ -282,13 +282,13 @@ main 与 release 对同一源码分别构建，JAR 摘要均为 `9cf1c7202df8390
 
 ## 8. 成员贡献
 
-每位成员一行，只填写 GitHub 用户名，无需填写姓名；行数应与小组人数一致。下表统计本实验仓库已合入 `main` 的 PR，以及 GitHub 审查状态为 `APPROVED` 的 PR。
+每位成员一行，按 GitHub 用户名（实际姓名）填写；行数与小组人数一致。下表统计本实验仓库已合入 `main` 的 PR，以及 GitHub 审查状态为 `APPROVED` 的 PR。
 
-| GitHub 用户名 | 发起并合入的 PR 编号 | 审批过的 PR 编号 |
+| GitHub 用户名（实际姓名） | 发起并合入的 PR 编号 | 审批过的 PR 编号 |
 |---|---|---|
-| KanaScale | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3)、[#8](https://github.com/KanaScale/ops-lab1-12/pull/8)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9)、[#10](https://github.com/KanaScale/ops-lab1-12/pull/10)、[#12](https://github.com/KanaScale/ops-lab1-12/pull/12) | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7)、[#14](https://github.com/KanaScale/ops-lab1-12/pull/14) |
-| CynicDora | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7)、[#14](https://github.com/KanaScale/ops-lab1-12/pull/14) | [#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3) |
-| fireDragon198 | [#4](https://github.com/KanaScale/ops-lab1-12/pull/4) | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6)、[#8](https://github.com/KanaScale/ops-lab1-12/pull/8)、[#12](https://github.com/KanaScale/ops-lab1-12/pull/12) |
-| Har0v0i86 | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5) | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#4](https://github.com/KanaScale/ops-lab1-12/pull/4)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9)、[#10](https://github.com/KanaScale/ops-lab1-12/pull/10) |
+| KanaScale（王常宇） | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3)、[#8](https://github.com/KanaScale/ops-lab1-12/pull/8)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9)、[#10](https://github.com/KanaScale/ops-lab1-12/pull/10)、[#12](https://github.com/KanaScale/ops-lab1-12/pull/12) | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7)、[#14](https://github.com/KanaScale/ops-lab1-12/pull/14) |
+| CynicDora（侯禹泽） | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6)、[#7](https://github.com/KanaScale/ops-lab1-12/pull/7)、[#14](https://github.com/KanaScale/ops-lab1-12/pull/14) | [#2](https://github.com/KanaScale/ops-lab1-12/pull/2)、[#3](https://github.com/KanaScale/ops-lab1-12/pull/3) |
+| fireDragon198（陈有志） | [#4](https://github.com/KanaScale/ops-lab1-12/pull/4) | [#6](https://github.com/KanaScale/ops-lab1-12/pull/6)、[#8](https://github.com/KanaScale/ops-lab1-12/pull/8)、[#12](https://github.com/KanaScale/ops-lab1-12/pull/12) |
+| Har0v0i86（罗唯恩） | [#5](https://github.com/KanaScale/ops-lab1-12/pull/5) | [#1](https://github.com/KanaScale/ops-lab1-12/pull/1)、[#4](https://github.com/KanaScale/ops-lab1-12/pull/4)、[#9](https://github.com/KanaScale/ops-lab1-12/pull/9)、[#10](https://github.com/KanaScale/ops-lab1-12/pull/10) |
 
-O3 使用另一仓库：CynicDora 发起并合入 [SE25Project-11 的 PR #76](https://github.com/CynicDora/SE25Project-11/pull/76)，KanaScale 在该 PR 提交了 `APPROVED` 审查。该 PR 不计入上表的本实验仓库编号。
+O3 使用另一仓库：CynicDora（侯禹泽）发起并合入 [SE25Project-11 的 PR #76](https://github.com/CynicDora/SE25Project-11/pull/76)，KanaScale（王常宇）在该 PR 提交了 `APPROVED` 审查。该 PR 不计入上表的本实验仓库编号。
