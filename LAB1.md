@@ -202,7 +202,7 @@ exit_code=0
 |---|---|
 | O1 容器镜像 | 已完成：[#9](https://github.com/KanaScale/ops-lab1-12/pull/9) 合入工作流；[v1.0.2 发布与镜像运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383152714) 均成功。摘要、架构和匿名拉取结果见下方。 |
 | O2 缓存对反馈时间的影响 | 已完成：[缓存开启 PR #10 的 CI](https://github.com/KanaScale/ops-lab1-12/actions/runs/39383771520) 与[缓存关闭、保持未合并的 PR #11](https://github.com/KanaScale/ops-lab1-12/pull/11) 各运行 6 次；逐次数据和分析见下方。 |
-| O3 迁移到小组项目 | 未做 |
+| O3 迁移到小组项目 | 已完成后端门禁、实际发布及追溯：[SE25Project-11](https://github.com/CynicDora/SE25Project-11)、[迁移 PR #76](https://github.com/CynicDora/SE25Project-11/pull/76)、[后端 v1.1.1](https://github.com/CynicDora/SE25Project-11/releases/tag/v1.1.1)。目标仓库仍为私有，匿名验收条件待确认；迁移差异与证据见下方。 |
 
 ### O1 镜像发布与运行证据
 
@@ -242,6 +242,43 @@ docker run -d --rm -p 127.0.0.1:18080:8080 ghcr.io/kanascale/ops-lab1-12@sha256:
 | 无缓存 | [6](https://github.com/KanaScale/ops-lab1-12/actions/runs/39385120232/job/118530926622) | 31 | 26 | 1 |
 
 **结果与局限。** attempt 2～6 的反馈时间：有缓存为 18、14、14、28、14 秒（均值 17.6、中位数 14、范围 14～28），无缓存为 44、33、33、30、31 秒（均值 34.2、中位数 33、范围 30～44）；本组样本的均值差为 16.6 秒。对应 job 均值为 13.8 与 29.6 秒。`setup-go` 本身在有缓存组反而平均耗时 3.4 秒，无缓存组为 1.2 秒；缓存收益主要体现在后续 `Vet`（平均 3.2 对 19.2 秒）与 `Test`（平均 0.8 对 3.2 秒）。这与“无第三方依赖仍可能受益于 Go 构建缓存”的预期一致，但不能把 16.6 秒当作稳定的加速承诺：各组只有 5 次重跑，执行时间不交错、提交并非逐字相同，共享 runner 负载和缓存服务延迟也会波动；有缓存组第 5 次的 `setup-go` 就花了 9 秒。计时还未包含 PR 创建到工作流启动之前的等待时间，不能代表真实团队从提交到获得反馈的完整周期。
+
+### O3 迁移到已有 Java 项目
+
+由 `CynicDora` 将门禁与发布流水线迁移到已有 [SE25Project-11](https://github.com/CynicDora/SE25Project-11) 的 `TechPrototype` 后端；`KanaScale` 审批 [PR #76](https://github.com/CynicDora/SE25Project-11/pull/76) 后正常 squash 合入 main，提交为 `fcaa2ba2fc3993ed8b0ae07555f7be8f7b9c5346`。项目中的手机端、Python 服务与既有交付快照不属于本次后端发布范围。
+
+| 迁移项 | 差异与处理 |
+|---|---|
+| 工具链与测试 | 从 Go 改为 Java 17 / Spring Boot / Maven，runner 仍固定 `ubuntu-24.04`，Temurin 固定 `17.0.16+8`。用 `mvn clean verify` 执行原有 JUnit 和 JaCoCo，保留行、分支覆盖率都至少 90% 的门槛；没有照搬 Go 的 fmt/vet 命令。 |
+| 合并 gate | 目标仓库 [ruleset 25707736](https://github.com/CynicDora/SE25Project-11/rules/25707736) 为 active、无 bypass，要求另一位成员 approve、必需 `ci`，禁止强推和删除；只允许 squash。PR/main 均触发 CI，无路径过滤。实际直接推 main 返回 GH013。 |
+| 制品 | Go 二进制改为 Spring Boot JAR；仍为单顶层目录的 `.tar.gz`，包含 `BUILD_INFO`，附同名 `.sha256`。main 制品保留 14 天；正式发布身份使用 tag、`github.run_number`、`github.sha` 和 `github.run_id`。 |
+| 发布 gate | 合法 `vX.Y.Z` tag 必须属于 main 历史，之后重新测试、打包、发布；ci 保持只读，release job 单独拥有写权限。复用课程原版 `scripts/trace.sh`。 |
+| 运行边界 | JAR 需要 Java 17 和数据库等外部配置；`run.sh --version` 读取 BUILD_INFO，不启动完整服务。本次没有证明数据库、手机端及 Python 服务集成部署成功，也没有执行生产回退。 |
+
+实际验证如下（2026-10-23，时长为单次 job 耗时）：
+
+| 验证 | 证据与结果 |
+|---|---|
+| 正常 PR CI | [39923504798](https://github.com/CynicDora/SE25Project-11/actions/runs/39923504798)，成功，66 秒；253 个 Java 测试全部通过，行覆盖率 97.38%、分支覆盖率 91.94%；另有 5 个流水线脚本测试通过。 |
+| 测试失败与修复 | 故意把产物版本断言 `1.1.1` 改为 `9.9.9` 后，[39923772373](https://github.com/CynicDora/SE25Project-11/actions/runs/39923772373) 失败、PR 为 BLOCKED；恢复断言后 [39923887289](https://github.com/CynicDora/SE25Project-11/actions/runs/39923887289) 成功，50 秒。 |
+| 拒绝未合并分支发布 | 测试 tag `v0.0.0` 指向未合入 main 的 `d962549`；[39923533631](https://github.com/CynicDora/SE25Project-11/actions/runs/39923533631) 在祖先检查处失败，未创建 Release。 |
+| main 制品 | [39927328838](https://github.com/CynicDora/SE25Project-11/actions/runs/39927328838)，成功，97 秒；artifact 为 `ci-fcaa2ba2fc3993ed8b0ae07555f7be8f7b9c5346-5`。 |
+| 正式发布 | [39927654545](https://github.com/CynicDora/SE25Project-11/actions/runs/39927654545)，成功，90 秒；生成 [后端 v1.1.1](https://github.com/CynicDora/SE25Project-11/releases/tag/v1.1.1) 的 tar.gz 与 sha256。 |
+| 下载与追溯 | 实际下载 v1.1.1 附件后，checksum、单顶层目录、BUILD_INFO 身份字段和包内 JAR 摘要均核对通过；原版 trace.sh 退出码为 0，追到同一 main 提交、PR #76 和 release run ID。 |
+
+下载包的身份记录为：
+
+```text
+version=1.1.1
+build_no=2
+commit=fcaa2ba2fc3993ed8b0ae07555f7be8f7b9c5346
+run_id=39927654545
+归档 SHA-256=9bb1f9ec42691f09b58da73c7c4d6564038c46d7e0117510e9c2b5284d8c1811
+```
+
+main 与 release 对同一源码分别构建，JAR 摘要均为 `9cf1c7202df83900b734e2bf6e77d1170f75db7c62813cc40112a7204681ad74`；两次 BUILD_INFO 的版本、构建号和 run ID 不同，因此归档摘要不同。这只说明本次两次构建的结果，不能推断所有环境都字节一致。原项目已有的 v1.1.0 是 Android APK，本次新发布的是后端包；旧附件在发布前后 asset ID、大小、digest 与更新时间一致。
+
+**访问条件尚待确认：** 目标项目保持原有私有可见性，链接需要相应仓库权限；门禁已实际生效，但不满足指导书的匿名公开检查条件。需仓库所有者与老师确认公开或访问安排，不能把技术验证通过等同于所有验收条件均已满足。
 
 ## 8. 成员贡献
 
