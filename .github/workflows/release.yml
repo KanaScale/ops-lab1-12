@@ -1,0 +1,157 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Release gate
+        run: |
+          git fetch origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::Tag commit $GITHUB_SHA is not in origin/main history."
+            exit 1
+          fi
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.26.9'
+
+      - name: Check formatting
+        run: make fmt-check
+
+      - name: Vet
+        run: make vet
+
+      - name: Test
+        run: make test
+
+      - name: Package release
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+          BUILD_NO: ${{ github.run_number }}
+          RUN_ID: ${{ github.run_id }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          VERSION="${TAG_NAME#v}"
+          make package VERSION="$VERSION" BUILD_NO="$BUILD_NO" RUN_ID="$RUN_ID" COMMIT="$COMMIT"
+
+      - name: Print and verify checksums
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          VERSION="${TAG_NAME#v}"
+          sha256sum "dist/enroll-conflict_${VERSION}_linux_amd64/enroll-conflict"
+          sha256sum dist/*.tar.gz
+          cd dist
+          sha256sum -c *.tar.gz.sha256
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG_NAME" --verify-tag --title "$TAG_NAME" --generate-notes \
+            dist/*.tar.gz dist/*.tar.gz.sha256
+
+  # The Release created with GITHUB_TOKEN cannot trigger a separate release-event workflow.
+  image:
+    name: Publish and run GHCR image
+    needs: release
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download and verify Release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          version="${TAG_NAME#v}"
+          archive="enroll-conflict_${version}_linux_amd64.tar.gz"
+          mkdir -p release-dist
+          gh release download "$TAG_NAME" --repo "$GITHUB_REPOSITORY" --dir release-dist
+          (cd release-dist && sha256sum -c "$archive.sha256")
+          tar -xzf "release-dist/$archive" -C release-dist
+          info="release-dist/enroll-conflict_${version}_linux_amd64/BUILD_INFO"
+          grep -Fx "version=$version" "$info"
+          grep -Fx "commit=$GITHUB_SHA" "$info"
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GHCR
+        env:
+          GHCR_TOKEN: ${{ github.token }}
+        run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+
+      - name: Build image from Release asset and push
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          version="${TAG_NAME#v}"
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          context="release-dist/enroll-conflict_${version}_linux_amd64"
+          docker buildx build \
+            --platform linux/amd64 \
+            --file "$GITHUB_WORKSPACE/Dockerfile" \
+            --tag "$image:$TAG_NAME" \
+            --build-arg "VERSION=$version" \
+            --build-arg "COMMIT=$GITHUB_SHA" \
+            --build-arg "SOURCE=https://github.com/$GITHUB_REPOSITORY" \
+            --metadata-file "$RUNNER_TEMP/image-metadata.json" \
+            --push "$context"
+          digest="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["containerimage.digest"])' "$RUNNER_TEMP/image-metadata.json")"
+          image_ref="$image@$digest"
+          printf 'IMAGE_REF=%s\n' "$image_ref" >> "$GITHUB_ENV"
+          printf 'Image digest: %s\n' "$image_ref"
+
+      - name: Run by digest and record architecture
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          host_arch="$(uname -m)"
+          docker pull "$IMAGE_REF"
+          image_platform="$(docker image inspect "$IMAGE_REF" --format '{{.Os}}/{{.Architecture}}')"
+          test "$image_platform" = linux/amd64
+          container_id="$(docker run -d --rm -p 127.0.0.1:18080:8080 "$IMAGE_REF")"
+          trap 'docker stop "$container_id" >/dev/null 2>&1 || true' EXIT
+          response="$(curl -fsS --retry 15 --retry-connrefused --retry-delay 1 http://127.0.0.1:18080/version)"
+          printf 'Host architecture: %s\nImage platform: %s\n/version: %s\n' "$host_arch" "$image_platform" "$response"
+          VERSION="${TAG_NAME#v}" COMMIT="$GITHUB_SHA" RESPONSE="$response" python3 -c 'import json,os; r=json.loads(os.environ["RESPONSE"]); assert r["version"] == os.environ["VERSION"]; assert r["commit"] == os.environ["COMMIT"]'
+          {
+            echo "### O1 container image"
+            echo "- Image: \`$IMAGE_REF\`"
+            echo "- Host architecture: \`$host_arch\`"
+            echo "- Image platform: \`$image_platform\`"
+            echo "- Run command: \`docker run -d --rm -p 127.0.0.1:18080:8080 $IMAGE_REF\`"
+            echo "- /version: \`$response\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Check anonymous pull
+        run: |
+          set -euo pipefail
+          anonymous_config="$(mktemp -d)"
+          if docker --config "$anonymous_config" pull "$IMAGE_REF" > "$RUNNER_TEMP/anonymous-pull.log" 2>&1; then
+            result=yes
+          else
+            result=no
+          fi
+          printf 'Anonymous pull: %s\n' "$result"
+          printf -- '- Anonymous pull: `%s`\n' "$result" >> "$GITHUB_STEP_SUMMARY"
