@@ -10,6 +10,7 @@ const (
 )
 
 // Section 是一个教学班在一周内的一个上课时段。
+// 123
 type Section struct {
 	ID      string `json:"id"`
 	Weekday int    `json:"weekday"` // 1=周一 … 7=周日
