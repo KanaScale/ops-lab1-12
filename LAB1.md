@@ -28,17 +28,16 @@
 | 任务 2：首次 CI 与主干制品 | [成功的 ci 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39020295552)；artifact：ci-460db78f01fb5fab539badcb6f67763a662bb766-1；trace.sh 校验和通过，追溯到提交 460db78f01fb5fab539badcb6f67763a662bb766、构建号 1、运行号 39020295552。 |
 | 规则集里启用的规则 | [lab1-main-merge-gate](https://github.com/KanaScale/ops-lab1-12/rules/25298191)：Active，仅适用于默认分支 main，绕过名单为空；Restrict deletions、Block force pushes、Require a pull request before merging（至少 1 人审批）、Require status checks to pass（必需检查 `ci`）。 |
 | 组长直接 `git push origin main` 被拒的终端输出 | 组长在 main 上创建空提交 `ea2d38f` 后执行 `git push origin main`，收到以下输出；验证后已将本地 main 恢复到 `origin/main`：<br>remote: error: GH013: Repository rule violations found for refs/heads/main.<br>remote: Review all repository rules at https://github.com/KanaScale/ops-lab1-12/rules?ref=refs%2Fheads%2Fmain<br>remote: - Changes must be made through a pull request.<br>remote: - Required status check "ci" is expected.<br>To https://github.com/KanaScale/ops-lab1-12.git<br> ! [remote rejected] main -> main (push declined due to repository rule violations)<br>error: failed to push some refs to 'https://github.com/KanaScale/ops-lab1-12.git' |
-| 第一轮：失败的 PR 运行 | [PR #2](https://github.com/KanaScale/ops-lab1-12/pull/2) 的 [首次 ci 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39214106124)：`make test` 发现单周班与双周班被误判为冲突，检查失败时 PR 状态为 BLOCKED。 |
-| 第一轮：修复后通过的 PR 运行 | [修复提交 0c1513b](https://github.com/KanaScale/ops-lab1-12/commit/0c1513b02777843a8c855d895ae2555445a9a09b) 恢复单双周互不冲突的判断；[ci 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39214314302) 通过。PR 的最终代码差异只新增“双周对双周冲突”测试用例。 |
-| 第一轮：合入 main 后的运行（含制品） | [PR #2](https://github.com/KanaScale/ops-lab1-12/pull/2) 经 CynicDora 审批后 squash 合并，main 提交为 [7998cbf](https://github.com/KanaScale/ops-lab1-12/commit/7998cbf66ecb753c4bda4e0dc298b0d51118e9d9)；[main 上成功的 ci 运行](https://github.com/KanaScale/ops-lab1-12/actions/runs/39216123207) 上传 artifact `ci-7998cbf66ecb753c4bda4e0dc298b0d51118e9d9-8`。 |
-| 第二轮：找到的缺陷，以及现有测试为何无法发现它 | 将 Section.Valid 的结束节次判断从 End < Start 改成 End <= Start，会把 Start=End 的单节课程错判为无效；原有 TestValid 只测试多节合法课程和其他非法输入，没有覆盖起止节次相等的合法边界。 |
-| 第二轮：仅含缺陷时仍然通过的运行 | [PR #4 的 ci #11](https://github.com/KanaScale/ops-lab1-12/actions/runs/39223510487)：仅含缺陷的提交 6ac8747，ci 成功。 |
-| 第二轮：补测试后失败的运行 | [PR #4 的 ci #12](https://github.com/KanaScale/ops-lab1-12/actions/runs/39224774268)：新增单节课程合法性测试后，ci 在 Test 步骤失败。 |
-| 第二轮：撤销缺陷后通过的运行 | [PR #4 的 ci #13](https://github.com/KanaScale/ops-lab1-12/actions/runs/39225332486)：撤销缺陷后通过；[#4](https://github.com/KanaScale/ops-lab1-12/pull/4) 经 Har0v0i86 审批并 squash 合入，main 只新增测试。 |
-| 未合入分支上的 tag 被 release gate 拒绝的运行 | [release 运行 39232007830](https://github.com/KanaScale/ops-lab1-12/actions/runs/39232007830)：未合入 main 的提交 7440b80 在 Release gate 步骤失败，后续打包与创建 Release 均跳过；测试用 v0.0.1 tag 和 scratch/gate-test 分支已删除。 |
-| Release v1.0.0 | [v1.0.0](https://github.com/KanaScale/ops-lab1-12/releases/tag/v1.0.0)，发布于 2026-10-19 17:40:27（北京时间）；任务 6 发布前的附件复核见第 4 节。 |
-| 任务 6：小改动、审批与合并 | CynicDora 的 [PR #6](https://github.com/KanaScale/ops-lab1-12/pull/6) 为 `/version` 增加 `Cache-Control: no-store` 及响应头测试；[PR ci #17](https://github.com/KanaScale/ops-lab1-12/actions/runs/39238364986) 通过，fireDragon198 于 2026-10-19 18:54:03（北京时间）正式 APPROVED，18:55:26 squash 合并为 [3fccca8](https://github.com/KanaScale/ops-lab1-12/commit/3fccca88908d51c86316dce5fcadc2c5dd14ca3f)，[main ci #18](https://github.com/KanaScale/ops-lab1-12/actions/runs/39240920512) 通过。 |
-| Release v1.0.1 | [v1.0.1](https://github.com/KanaScale/ops-lab1-12/releases/tag/v1.0.1)，发布于 2026-10-19 18:57:31（北京时间）；[release #3](https://github.com/KanaScale/ops-lab1-12/actions/runs/39241133673) 的主干祖先检查、fmt-check、vet、test、打包与校验均通过。 |
+| 第一轮：失败的 PR 运行 | <链接> |
+| 第一轮：修复后通过的 PR 运行 | <链接> |
+| 第一轮：合入 main 后的运行（含制品） | <链接> |
+| 第二轮：找到的缺陷，以及现有测试为何无法发现它 | <一两句话> |
+| 第二轮：仅含缺陷时仍然通过的运行 | <链接> |
+| 第二轮：补测试后失败的运行 | <链接> |
+| 第二轮：撤销缺陷后通过的运行 | <链接> |
+| 未合入分支上的 tag 被 release gate 拒绝的运行 | <链接> |
+| Release v1.0.0 | <链接> |
+| Release v1.0.1 | <链接> |
 
 ## 4. 追溯与运行
 
